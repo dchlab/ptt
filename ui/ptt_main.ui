@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ptt_main</class>
+ <widget class="QMainWindow" name="ptt_main">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>592</width>
+    <height>393</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>592</width>
+    <height>393</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>592</width>
+    <height>393</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>PTT - Python Time Tracker</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTableWidget" name="lst_tasks">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>571</width>
+      <height>289</height>
+     </rect>
+    </property>
+    <property name="contextMenuPolicy">
+     <enum>Qt::ActionsContextMenu</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">alternate-background-color: rgb(220, 235, 245);</string>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+    <property name="alternatingRowColors">
+     <bool>true</bool>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::ExtendedSelection</enum>
+    </property>
+    <property name="selectionBehavior">
+     <enum>QAbstractItemView::SelectRows</enum>
+    </property>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>100</number>
+    </attribute>
+    <attribute name="horizontalHeaderMinimumSectionSize">
+     <number>50</number>
+    </attribute>
+    <attribute name="horizontalHeaderStretchLastSection">
+     <bool>true</bool>
+    </attribute>
+    <attribute name="verticalHeaderVisible">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="verticalHeaderDefaultSectionSize">
+     <number>22</number>
+    </attribute>
+    <attribute name="verticalHeaderMinimumSectionSize">
+     <number>22</number>
+    </attribute>
+    <column>
+     <property name="text">
+      <string>     Démarrée le     </string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Durée</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Description</string>
+     </property>
+    </column>
+   </widget>
+   <widget class="QLineEdit" name="z_task_to_add">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>421</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="placeholderText">
+     <string>Entrez la description de votre tâche ici, puis Entrée ou &quot;Ajouter une tâche&quot;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_task_add">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>10</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Ajouter une tâche</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_lst_tasks_empty">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>340</y>
+      <width>101</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Vider la liste</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>592</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="mnu_settings">
+    <property name="title">
+     <string>PTT</string>
+    </property>
+    <addaction name="action_about"/>
+    <addaction name="separator"/>
+    <addaction name="action_quit"/>
+   </widget>
+   <addaction name="mnu_settings"/>
+  </widget>
+  <action name="action_about">
+   <property name="text">
+    <string>A propos de PTT</string>
+   </property>
+  </action>
+  <action name="action_quit">
+   <property name="text">
+    <string>Quitter</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>z_task_to_add</tabstop>
+  <tabstop>btn_task_add</tabstop>
+  <tabstop>lst_tasks</tabstop>
+  <tabstop>btn_lst_tasks_empty</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
