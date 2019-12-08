@@ -25,6 +25,10 @@
   <property name="windowTitle">
    <string>PTT - Python Time Tracker</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>ptt.ico</normaloff>ptt.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTableWidget" name="lst_tasks">
     <property name="geometry">
@@ -127,7 +131,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
+  <widget class="QMenuBar" name="menubar_ptt">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -136,22 +140,22 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="mnu_settings">
+   <widget class="QMenu" name="menu_ptt">
     <property name="title">
      <string>PTT</string>
     </property>
-    <addaction name="action_about"/>
+    <addaction name="actionAbout"/>
     <addaction name="separator"/>
-    <addaction name="action_quit"/>
+    <addaction name="actionQuit"/>
    </widget>
-   <addaction name="mnu_settings"/>
+   <addaction name="menu_ptt"/>
   </widget>
-  <action name="action_about">
+  <action name="actionAbout">
    <property name="text">
     <string>A propos de PTT</string>
    </property>
   </action>
-  <action name="action_quit">
+  <action name="actionQuit">
    <property name="text">
     <string>Quitter</string>
    </property>

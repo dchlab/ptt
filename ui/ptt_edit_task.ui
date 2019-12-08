@@ -28,6 +28,10 @@
   <property name="windowTitle">
    <string>PTT - Modification de la tâche</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>ptt.ico</normaloff>ptt.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="grp_duration">
     <property name="geometry">
