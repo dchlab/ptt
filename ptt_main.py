@@ -585,17 +585,6 @@ def auto_increment_active_task():
     add_duration_to_task_at_row(0, glb_default_added_duration_in_sec)
 
 
-# Function create_new_task_at_startup : create a new task a with dedicated text, at startup
-def create_new_task_at_startup():
-
-    # Making sure we have some rows at least...
-    w_nbr_rows = ptt_main_dlg.lst_tasks.rowCount()
-
-    # Creating a default task when none are found to avoid loosing the logged time
-    if w_nbr_rows == 0:
-        add_new_task(glb_new_task_at_startup)
-
-
 # Function enable_lst_tasks_popup_actions : makes actions visible or not for the lst_tasks list
 def enable_lst_tasks_popup_actions():
 
@@ -977,8 +966,8 @@ if __name__ == "__main__":
     # Loading my tasks
     load_tasks_from_file()
 
-    # Create a new task at startup ONLY and if needed (if none found)
-    create_new_task_at_startup()
+    # Create a new task at startup
+    add_new_task(glb_new_task_at_startup)
 
     # Refreshing the empty tasks button activation
     enable_btn_lst_tasks_empty()
