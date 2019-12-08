@@ -4,6 +4,7 @@
 """
 * --------------------------------------------------------------------------------- *
 * Application name : PTT (Python Time Tracker)
+* Script name : ptt_main.py
 * Created by DCH (June / December 2019)
 * --------------------------------------------------------------------------------- *
 * Modified by XXX on the DD/MM/YYYY
@@ -13,15 +14,15 @@
 * - Note that the .ui files are loaded dynamically (for now)
 * --------------------------------------------------------------------------------- *
 * Source files required :
-* - ptt_main.py
-* - ptt_info.py
+* - ptt_main.py                         The main script
+* - ptt_info.py                         Class PttAppInfo
 * Resources and UI files required :
-* - /ui/ptt_main.ui
-* - /ui/ptt_edit_task.ui
-* - /ui/ptt.ico
+* - /ui/ptt_main.ui                     Main window form
+* - /ui/ptt_edit_task.ui                Edit task form
+* - /ui/ptt.ico                         Icon used in .ui files
 * User data files used :
-* - /data/my_tasks.json
-* - /data/my_tasks.backup
+* - /data/my_tasks.json                 Tasks saved in a JSON format
+* - /data/my_tasks.backup               Backup of the previous file (at startup)
 * --------------------------------------------------------------------------------- *
 To build the application from PyInstaller, go in the ptt (root) folder then :
 pyinstaller ptt_main.py -w -n ptt.exe --add-data="ui\*.*";"ui"
@@ -115,6 +116,9 @@ glb_maximum_time_per_task.setHMS(8, 0, 0)
 
 # Default task name for the task automatically created, if none was found
 glb_default_task_name = "Tâche créée automatiquement"
+
+# Task name text when the application starts up AND if no tasks found
+glb_new_task_at_startup = "Tâche créée au démarrage de l'application"
 
 # Popup actions text displayed
 glb_actionActivate_text = "Activer"
@@ -354,8 +358,8 @@ def change_active_task(p_row: int, p_column: int):
         # Replacing the focus at the top
         default_focus()
 
-        # Save my tasks on disk
-        save_tasks_to_file()
+    # Save my tasks on disk
+    save_tasks_to_file()
 
 
 # Function empty_lst_tasks : removes all rows by setting the counter of the lst_tasks to 0
@@ -581,6 +585,17 @@ def auto_increment_active_task():
     add_duration_to_task_at_row(0, glb_default_added_duration_in_sec)
 
 
+# Function create_new_task_at_startup : create a new task a with dedicated text, at startup
+def create_new_task_at_startup():
+
+    # Making sure we have some rows at least...
+    w_nbr_rows = ptt_main_dlg.lst_tasks.rowCount()
+
+    # Creating a default task when none are found to avoid loosing the logged time
+    if w_nbr_rows == 0:
+        add_new_task(glb_new_task_at_startup)
+
+
 # Function enable_lst_tasks_popup_actions : makes actions visible or not for the lst_tasks list
 def enable_lst_tasks_popup_actions():
 
@@ -749,7 +764,8 @@ def read_current_task():
 def call_ptt_edit_task():
 
     # Sending parameters to the edit window with a signal emitted
-    ptt_main_calling_edit.edit_task_signal.emit(z_curr_row, z_curr_task_dth, z_curr_task_duration, z_curr_task_description)
+    ptt_main_calling_edit.edit_task_signal.emit(z_curr_row, z_curr_task_dth, z_curr_task_duration,
+                                                z_curr_task_description)
 
     # Putting the focus on the 1st button
     ptt_edit_task_dlg.btn_1min.setFocus()
@@ -766,7 +782,8 @@ def call_ptt_edit_task():
 
 
 # Function update_task_after_edit : updates a task after it was edited and saved in the edit window
-def update_task_after_edit(p_curr_row: int, p_curr_task_dth: str, p_curr_task_duration: str, p_curr_task_description: str):
+def update_task_after_edit(p_curr_row: int, p_curr_task_dth: str, p_curr_task_duration: str,
+                           p_curr_task_description: str):
 
     # Updating the row contents in the list
     update_lst_tasks_row_cells(p_curr_row, p_curr_task_dth, p_curr_task_duration, p_curr_task_description)
@@ -850,7 +867,8 @@ def load_tasks_from_file():
         ptt_main_dlg.lst_tasks.insertRow(w_row_count)
 
         # Filling the text in each cells of the new row
-        update_lst_tasks_row_cells(w_row_count, w_task_record["started_on"], w_task_record["duration"], w_task_record["description"])
+        update_lst_tasks_row_cells(
+            w_row_count, w_task_record["started_on"], w_task_record["duration"], w_task_record["description"])
 
     # Forcing the 1st displayed row to become the active task if at least one record loaded
     w_row_count = ptt_main_dlg.lst_tasks.rowCount()
@@ -934,7 +952,8 @@ def ptt_edit_task_send_data():
     p_curr_task_description = ptt_edit_task_dlg.z_task_description.toPlainText()
 
     # Sending parameters to the main window with a signal emitted
-    ptt_edit_task_saving.edit_task_signal.emit(p_curr_row, p_curr_task_dth, p_curr_task_duration, p_curr_task_description)
+    ptt_edit_task_saving.edit_task_signal.emit(p_curr_row, p_curr_task_dth, p_curr_task_duration,
+                                               p_curr_task_description)
 
     # Closing the edit window
     ptt_edit_task_dlg.close()
@@ -957,6 +976,9 @@ if __name__ == "__main__":
 
     # Loading my tasks
     load_tasks_from_file()
+
+    # Create a new task at startup ONLY and if needed (if none found)
+    create_new_task_at_startup()
 
     # Refreshing the empty tasks button activation
     enable_btn_lst_tasks_empty()
