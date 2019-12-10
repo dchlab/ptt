@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>592</width>
+    <width>601</width>
     <height>393</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>592</width>
+    <width>601</width>
     <height>393</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>592</width>
+    <width>601</width>
     <height>393</height>
    </size>
   </property>
@@ -35,7 +35,7 @@
      <rect>
       <x>10</x>
       <y>40</y>
-      <width>571</width>
+      <width>581</width>
       <height>289</height>
      </rect>
     </property>
@@ -96,7 +96,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>421</width>
+      <width>431</width>
       <height>22</height>
      </rect>
     </property>
@@ -107,7 +107,7 @@
    <widget class="QPushButton" name="btn_task_add">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>450</x>
       <y>10</y>
       <width>141</width>
       <height>23</height>
@@ -120,9 +120,9 @@
    <widget class="QPushButton" name="btn_lst_tasks_empty">
     <property name="geometry">
      <rect>
-      <x>480</x>
+      <x>470</x>
       <y>340</y>
-      <width>101</width>
+      <width>121</width>
       <height>23</height>
      </rect>
     </property>
@@ -136,7 +136,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>592</width>
+     <width>601</width>
      <height>21</height>
     </rect>
    </property>

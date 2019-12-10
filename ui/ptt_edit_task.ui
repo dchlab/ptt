@@ -9,20 +9,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>431</width>
-    <height>341</height>
+    <width>481</width>
+    <height>361</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>431</width>
-    <height>341</height>
+    <width>481</width>
+    <height>361</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>431</width>
-    <height>341</height>
+    <width>481</width>
+    <height>361</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -38,7 +38,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>411</width>
+      <width>461</width>
       <height>91</height>
      </rect>
     </property>
@@ -54,9 +54,9 @@
     <widget class="QTimeEdit" name="z_task_duration">
      <property name="geometry">
       <rect>
-       <x>310</x>
+       <x>350</x>
        <y>20</y>
-       <width>91</width>
+       <width>101</width>
        <height>53</height>
       </rect>
      </property>
@@ -80,7 +80,7 @@
     <widget class="QPushButton" name="btn_reset">
      <property name="geometry">
       <rect>
-       <x>220</x>
+       <x>260</x>
        <y>20</y>
        <width>81</width>
        <height>53</height>
@@ -99,9 +99,9 @@
     <widget class="QPushButton" name="btn_5min">
      <property name="geometry">
       <rect>
-       <x>60</x>
+       <x>70</x>
        <y>20</y>
-       <width>41</width>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -120,7 +120,7 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>41</width>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -137,9 +137,9 @@
     <widget class="QPushButton" name="btn_4h">
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>130</x>
        <y>50</y>
-       <width>41</width>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -158,7 +158,7 @@
       <rect>
        <x>10</x>
        <y>50</y>
-       <width>41</width>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -175,9 +175,9 @@
     <widget class="QPushButton" name="btn_30min">
      <property name="geometry">
       <rect>
-       <x>160</x>
+       <x>190</x>
        <y>20</y>
-       <width>41</width>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -194,9 +194,9 @@
     <widget class="QPushButton" name="btn_15min">
      <property name="geometry">
       <rect>
-       <x>110</x>
+       <x>130</x>
        <y>20</y>
-       <width>41</width>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -213,9 +213,9 @@
     <widget class="QPushButton" name="btn_2h">
      <property name="geometry">
       <rect>
-       <x>60</x>
+       <x>70</x>
        <y>50</y>
-       <width>41</width>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -232,9 +232,9 @@
     <widget class="QPushButton" name="btn_8h">
      <property name="geometry">
       <rect>
-       <x>160</x>
+       <x>190</x>
        <y>50</y>
-       <width>41</width>
+       <width>51</width>
        <height>23</height>
       </rect>
      </property>
@@ -252,9 +252,9 @@
    <widget class="QPushButton" name="btn_save">
     <property name="geometry">
      <rect>
-      <x>330</x>
-      <y>310</y>
-      <width>91</width>
+      <x>360</x>
+      <y>330</y>
+      <width>111</width>
       <height>23</height>
      </rect>
     </property>
@@ -267,8 +267,8 @@
      <rect>
       <x>10</x>
       <y>110</y>
-      <width>411</width>
-      <height>191</height>
+      <width>461</width>
+      <height>211</height>
      </rect>
     </property>
     <property name="font">
@@ -285,8 +285,8 @@
       <rect>
        <x>10</x>
        <y>60</y>
-       <width>391</width>
-       <height>121</height>
+       <width>441</width>
+       <height>141</height>
       </rect>
      </property>
      <property name="font">
@@ -326,7 +326,7 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>231</width>
+       <width>281</width>
        <height>22</height>
       </rect>
      </property>
@@ -337,13 +337,13 @@
       </font>
      </property>
      <property name="text">
-      <string>Tâche démarrée le</string>
+      <string>Date et heure de démarrage de la tâche</string>
      </property>
     </widget>
     <widget class="QDateTimeEdit" name="z_task_dth">
      <property name="geometry">
       <rect>
-       <x>250</x>
+       <x>300</x>
        <y>20</y>
        <width>151</width>
        <height>22</height>
