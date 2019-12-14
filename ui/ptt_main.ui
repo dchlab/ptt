@@ -29,6 +29,9 @@
    <iconset>
     <normaloff>ptt.ico</normaloff>ptt.ico</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true">font: 9pt &quot;Segoe UI&quot;;</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTableWidget" name="lst_tasks">
     <property name="geometry">

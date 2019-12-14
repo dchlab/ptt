@@ -698,8 +698,8 @@ def merge_selected_tasks():
             # Add the duration read to the total task duration
             w_total_duration_in_secs = w_total_duration_in_secs + w_task_duration_in_secs
 
-        # Merge is aborted if the total duration of merged tasks exceeds (or is equal) to the max task duration !
-        if w_total_duration_in_secs >= glb_max_task_duration_in_sec:
+        # Merge is aborted if the total duration of merged tasks exceeds to the max task duration !
+        if w_total_duration_in_secs > glb_max_task_duration_in_sec:
 
             # Error popup message
             error_popup_ok(glb_popup_title_merging_error, glb_popup_text_merging_failed)
@@ -888,17 +888,33 @@ def ptt_edit_task_duration_reset():
     ptt_edit_task_dlg.z_task_duration.setTime(w_qt_reset)
 
 
-# ptt_edit_task / Function ptt_edit_task_add_duration : adds the value sent by buttons to the duration field
+# ptt_edit_task / Function ptt_edit_task_add_duration : adds/subtracts the value sent by buttons to the duration field
 def ptt_edit_task_add_duration(p_value_in_min: int):
+
+    # Miscellaneous initializations
+    w_multiplier = 1
+
+    # Checking the state of the "toggle" button +/-. Note : if it's checked, it means "+".
+    if ptt_edit_task_dlg.btn_plus_minus.isChecked() is False:
+        w_multiplier = -1
 
     # For now, forcing min/max values for the duration (see globals at the top)
     ptt_edit_task_dlg.z_task_duration.setMinimumTime(glb_minimum_time_per_task)
     ptt_edit_task_dlg.z_task_duration.setMaximumTime(glb_maximum_time_per_task)
 
-    # Adding the duration to the field
+    # Adding / subtracting the duration to the field
     w_time = ptt_edit_task_dlg.z_task_duration.time()
-    w_result = w_time.addSecs(p_value_in_min*60)
+    w_result = w_time.addSecs(w_multiplier*p_value_in_min*60)
     ptt_edit_task_dlg.z_task_duration.setTime(w_result)
+
+
+# ptt_edit_task / Function ptt_edit_task_update_btn_plus_minus_text : changes the text of the +/- toggle button
+def ptt_edit_task_update_btn_plus_minus_text():
+
+    if ptt_edit_task_dlg.btn_plus_minus.isChecked() is True:
+        ptt_edit_task_dlg.btn_plus_minus.setText("+")
+    else:
+        ptt_edit_task_dlg.btn_plus_minus.setText("-")
 
 
 # ------------------------------------------- #
@@ -1047,6 +1063,9 @@ ptt_edit_task_dlg.btn_1h.clicked.connect(lambda: ptt_edit_task_add_duration(60))
 ptt_edit_task_dlg.btn_2h.clicked.connect(lambda: ptt_edit_task_add_duration(120))
 ptt_edit_task_dlg.btn_4h.clicked.connect(lambda: ptt_edit_task_add_duration(240))
 ptt_edit_task_dlg.btn_8h.clicked.connect(lambda: ptt_edit_task_add_duration(480))
+
+# Changing the text of the toggle button "+/-"
+ptt_edit_task_dlg.btn_plus_minus.toggled.connect(lambda: ptt_edit_task_update_btn_plus_minus_text())
 
 # Navigation management between ptt_main <-> ptt_edit_task (calls, I/O parameters...)
 ptt_main_calling_edit.edit_task_signal.connect(ptt_edit_task_get_data)

@@ -9,21 +9,29 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>481</width>
+    <width>562</width>
     <height>361</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>481</width>
+    <width>562</width>
     <height>361</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>481</width>
+    <width>562</width>
     <height>361</height>
    </size>
+  </property>
+  <property name="font">
+   <font>
+    <family>Segoe UI</family>
+    <weight>50</weight>
+    <italic>false</italic>
+    <bold>false</bold>
+   </font>
   </property>
   <property name="windowTitle">
    <string>PTT - Modification de la tâche</string>
@@ -32,18 +40,23 @@
    <iconset>
     <normaloff>ptt.ico</normaloff>ptt.ico</iconset>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QGroupBox" name="grp_duration">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>461</width>
+      <width>541</width>
       <height>91</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Segoe UI</family>
+      <pointsize>9</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
@@ -54,7 +67,7 @@
     <widget class="QTimeEdit" name="z_task_duration">
      <property name="geometry">
       <rect>
-       <x>350</x>
+       <x>430</x>
        <y>20</y>
        <width>101</width>
        <height>53</height>
@@ -76,11 +89,18 @@
      <property name="buttonSymbols">
       <enum>QAbstractSpinBox::NoButtons</enum>
      </property>
+     <property name="maximumTime">
+      <time>
+       <hour>8</hour>
+       <minute>0</minute>
+       <second>0</second>
+      </time>
+     </property>
     </widget>
     <widget class="QPushButton" name="btn_reset">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>330</x>
        <y>20</y>
        <width>81</width>
        <height>53</height>
@@ -88,7 +108,10 @@
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -99,7 +122,7 @@
     <widget class="QPushButton" name="btn_5min">
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>140</x>
        <y>20</y>
        <width>51</width>
        <height>23</height>
@@ -107,7 +130,10 @@
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -118,7 +144,7 @@
     <widget class="QPushButton" name="btn_1min">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>80</x>
        <y>20</y>
        <width>51</width>
        <height>23</height>
@@ -126,7 +152,10 @@
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -137,7 +166,7 @@
     <widget class="QPushButton" name="btn_4h">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>200</x>
        <y>50</y>
        <width>51</width>
        <height>23</height>
@@ -145,7 +174,10 @@
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -156,7 +188,7 @@
     <widget class="QPushButton" name="btn_1h">
      <property name="geometry">
       <rect>
-       <x>10</x>
+       <x>80</x>
        <y>50</y>
        <width>51</width>
        <height>23</height>
@@ -164,7 +196,10 @@
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -175,7 +210,7 @@
     <widget class="QPushButton" name="btn_30min">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>260</x>
        <y>20</y>
        <width>51</width>
        <height>23</height>
@@ -183,7 +218,10 @@
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -194,7 +232,7 @@
     <widget class="QPushButton" name="btn_15min">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>200</x>
        <y>20</y>
        <width>51</width>
        <height>23</height>
@@ -202,7 +240,10 @@
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -213,7 +254,7 @@
     <widget class="QPushButton" name="btn_2h">
      <property name="geometry">
       <rect>
-       <x>70</x>
+       <x>140</x>
        <y>50</y>
        <width>51</width>
        <height>23</height>
@@ -221,7 +262,10 @@
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -232,7 +276,7 @@
     <widget class="QPushButton" name="btn_8h">
      <property name="geometry">
       <rect>
-       <x>190</x>
+       <x>260</x>
        <y>50</y>
        <width>51</width>
        <height>23</height>
@@ -240,7 +284,10 @@
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -248,15 +295,47 @@
       <string>8 h</string>
      </property>
     </widget>
+    <widget class="QPushButton" name="btn_plus_minus">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>53</width>
+       <height>53</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>14</pointsize>
+       <weight>50</weight>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>+</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
    <widget class="QPushButton" name="btn_save">
     <property name="geometry">
      <rect>
-      <x>360</x>
+      <x>440</x>
       <y>330</y>
       <width>111</width>
       <height>23</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>9</pointsize>
+     </font>
     </property>
     <property name="text">
      <string>Enregistrer</string>
@@ -267,12 +346,14 @@
      <rect>
       <x>10</x>
       <y>110</y>
-      <width>461</width>
+      <width>541</width>
       <height>211</height>
      </rect>
     </property>
     <property name="font">
      <font>
+      <family>Segoe UI</family>
+      <pointsize>9</pointsize>
       <weight>75</weight>
       <bold>true</bold>
      </font>
@@ -285,20 +366,20 @@
       <rect>
        <x>10</x>
        <y>60</y>
-       <width>441</width>
+       <width>521</width>
        <height>141</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
      <property name="tabChangesFocus">
-      <bool>true</bool>
-     </property>
-     <property name="overwriteMode">
       <bool>true</bool>
      </property>
     </widget>
@@ -307,13 +388,16 @@
       <rect>
        <x>10</x>
        <y>40</y>
-       <width>231</width>
+       <width>371</width>
        <height>22</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -326,13 +410,16 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>281</width>
+       <width>361</width>
        <height>22</height>
       </rect>
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -343,7 +430,7 @@
     <widget class="QDateTimeEdit" name="z_task_dth">
      <property name="geometry">
       <rect>
-       <x>300</x>
+       <x>380</x>
        <y>20</y>
        <width>151</width>
        <height>22</height>
@@ -351,7 +438,10 @@
      </property>
      <property name="font">
       <font>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
        <weight>50</weight>
+       <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
@@ -379,6 +469,7 @@
   </widget>
  </widget>
  <tabstops>
+  <tabstop>btn_plus_minus</tabstop>
   <tabstop>btn_1min</tabstop>
   <tabstop>btn_5min</tabstop>
   <tabstop>btn_15min</tabstop>
