@@ -62,10 +62,40 @@ def ptt_resource_path(p_relative_path: str):
 
 
 # ------------------------------------------- #
+# Classes
+# ------------------------------------------- #
+
+# Class PttFiles : contents the file names used in the application
+class PttFiles:
+    def __init__(self):
+        self.my_tasks_json = "data/my_tasks.json"
+        self.my_tasks_backup = "data/my_tasks.backup"
+
+
+# Class PttResourcesFiles : contents the file names used for the resources in the application
+class PttResourcesFiles:
+    def __init__(self):
+        self.main_ui = "ui/ptt_main.ui"
+        self.edit_task_ui = "ui/ptt_edit_task.ui"
+        self.ptt_ico = "ui/ptt.ico"
+
+
+# Object for edit_task_signal calling parameters between windows
+class PttEditObject(QObject):
+    edit_task_signal = QtCore.pyqtSignal(int, str, str, str)
+
+
+# Classes initializations
+ptt_main_calling_edit = PttEditObject()
+ptt_edit_task_saving = PttEditObject()
+ptt_resources = PttResourcesFiles()
+
+
+# ------------------------------------------- #
 # Main window (ptt_main)
 # ------------------------------------------- #
 
-ptt_main_ui_path = ptt_resource_path("ui/ptt_main.ui")
+ptt_main_ui_path = ptt_resource_path(ptt_resources.main_ui)
 ptt_main_app = QtWidgets.QApplication([])
 ptt_main_dlg = uic.loadUi(ptt_main_ui_path)
 
@@ -73,7 +103,7 @@ ptt_main_dlg = uic.loadUi(ptt_main_ui_path)
 # Edit task window (ptt_edit_task)
 # ------------------------------------------- #
 
-ptt_edit_task_ui_path = ptt_resource_path("ui/ptt_edit_task.ui")
+ptt_edit_task_ui_path = ptt_resource_path(ptt_resources.edit_task_ui)
 ptt_edit_task_app = QtWidgets.QApplication([])
 ptt_edit_task_dlg = uic.loadUi(ptt_edit_task_ui_path)
 
@@ -113,6 +143,10 @@ glb_maximum_time_per_task.setHMS(8, 0, 0)
 
 # Important note : for now, only texts of the buttons are dynamically translated (fr_FR or default)
 # Rest of the text errors are only in french for now in this version...
+
+# Labels for "+" and "-"
+glb_plus = "+"
+glb_minus = "-"
 
 # Default task name for the task automatically created, if none was found
 glb_default_task_name = "Tâche créée automatiquement"
@@ -186,27 +220,6 @@ ptt_main_dlg.lst_tasks.addAction(actionDelete)
 
 
 # ------------------------------------------- #
-# Classes
-# ------------------------------------------- #
-
-# Class PttFiles : contents the file names used in the application
-class PttFiles:
-    def __init__(self):
-        self.my_tasks_json = "data/my_tasks.json"
-        self.my_tasks_backup = "data/my_tasks.backup"
-
-
-# Object for edit_task_signal calling parameters between windows
-class PttEditObject(QObject):
-    edit_task_signal = QtCore.pyqtSignal(int, str, str, str)
-
-
-# Classes initializations
-ptt_main_calling_edit = PttEditObject()
-ptt_edit_task_saving = PttEditObject()
-
-
-# ------------------------------------------- #
 # Functions of ptt_main window
 # ------------------------------------------- #
 
@@ -224,8 +237,9 @@ def error_popup_ok(p_popup_title: str, p_popup_text: str):
     # Retrieving the locale system value
     w_locale = QtCore.QLocale.system().name()
 
-    # Creating a new message box
+    # Creating a new message box with the application icon
     w_popup = QMessageBox()
+    w_popup.setWindowIcon(QtGui.QIcon(ptt_resources.ptt_ico))
 
     # If the locale says it's french and french UI
     if w_locale == glb_locale_fr_FR:
@@ -256,8 +270,9 @@ def info_popup_ok(p_popup_title: str, p_popup_text: str):
     # Retrieving the locale system value
     w_locale = QtCore.QLocale.system().name()
 
-    # Creating a new message box
+    # Creating a new message box with the application icon
     w_popup = QMessageBox()
+    w_popup.setWindowIcon(QtGui.QIcon(ptt_resources.ptt_ico))
 
     # If the locale says it's french and french UI
     if w_locale == glb_locale_fr_FR:
@@ -291,8 +306,9 @@ def warning_popup_yes_no(p_popup_title: str, p_popup_question: str):
     # Retrieving the locale system value
     w_locale = QtCore.QLocale.system().name()
 
-    # Creating a new message box
+    # Creating a new message box with the application icon
     w_popup = QMessageBox()
+    w_popup.setWindowIcon(QtGui.QIcon(ptt_resources.ptt_ico))
 
     # If the locale says it's french and french UI
     if w_locale == glb_locale_fr_FR:
@@ -334,26 +350,33 @@ def warning_popup_yes_no(p_popup_title: str, p_popup_question: str):
 def change_active_task(p_row: int, p_column: int):
 
     # Note : no use yet for p_column
-    # The parameter is kept cause it's sent by a signal (like double clicking)
+    # The parameter is kept cause it is sent by a signal which requires 2 parameters (like double clicking)
 
     # Making sure we have some rows at least...
-    w_nbr_rows = ptt_main_dlg.lst_tasks.rowCount()
-
-    if w_nbr_rows > 0:
+    if ptt_main_dlg.lst_tasks.rowCount() > 0:
 
         # Restart the global active task timer (only if we activate a task which is not the already activated one)
         if p_row > 0:
             glb_active_task_timer.start(glb_timer_interval_in_msec)
 
-        # Retrieves the text of the 3 cells from the selected line (any row but fixed columns values)
+        # Retrieves the text of the 3 cells from the selected line
         w_cell0_selected, w_cell1_selected, w_cell2_selected = get_lst_tasks_row_cells(p_row)
 
-        # Retrieves the text of the 3 cells from the 1st row (the row 0 alias the active task but fixed columns values)
-        w_cell0_1st_row, w_cell1_1st_row, w_cell2_1st_row = get_lst_tasks_row_cells(0)
+        # If the task to be activated is not at row 0, inserting a new row at the top of the list
+        if p_row > 0:
+            ptt_main_dlg.lst_tasks.insertRow(0)
 
-        # /!\ Swapping the cells CONTENTS between the 1st row displayed and the selected one
-        update_lst_tasks_row_cells(p_row, w_cell0_1st_row, w_cell1_1st_row, w_cell2_1st_row)
+        # Fix to avoid the "yellow line" (= text refreshed) on the 2nd row (row 1) when inserting new row
+        if ptt_main_dlg.lst_tasks.rowCount() > 1:
+            w_cell0_row1, w_cell1_row1, w_cell2_row1 = get_lst_tasks_row_cells(1)
+            update_lst_tasks_row_cells(1, w_cell0_row1, w_cell1_row1, w_cell2_row1)
+
+        # Updating the cells contents after creating the new row
         update_lst_tasks_row_cells(0, w_cell0_selected, w_cell1_selected, w_cell2_selected)
+
+        # If the task to be activated is not at row 0, removing the original row at (row + 1)
+        if p_row > 0:
+            ptt_main_dlg.lst_tasks.removeRow(p_row + 1)
 
         # Replacing the focus at the top
         default_focus()
@@ -441,18 +464,17 @@ def add_new_task(p_text_task: str):
         w_now_dth = QtCore.QDateTime.currentDateTime()
         w_now_dth_string = w_now_dth.toString(glb_dd_MM_yyyy_hh_mm_string_format)
 
-        # Getting the numbers of rows and inserting a new one (at the row_count position = at the end)
-        w_row_count = ptt_main_dlg.lst_tasks.rowCount()
-        ptt_main_dlg.lst_tasks.insertRow(w_row_count)
+        # Inserting a new task at the 1st row of the list
+        ptt_main_dlg.lst_tasks.insertRow(0)
 
         # Filling the text in each cells of the new row
-        update_lst_tasks_row_cells(w_row_count, w_now_dth_string, glb_00_00_time, p_text_task)
+        update_lst_tasks_row_cells(0, w_now_dth_string, glb_00_00_time, p_text_task)
 
         # Setting to blank the entry text
         ptt_main_dlg.z_task_to_add.setText(glb_empty_str)
 
         # Turning the new task added into the active one
-        change_active_task(w_row_count, 0)
+        change_active_task(0, 0)
 
         # Refreshing the empty tasks button activation
         enable_btn_lst_tasks_empty()
@@ -529,7 +551,7 @@ def add_duration_to_task_at_row(p_row: int, p_duration_to_add_in_secs: int):
         w_task_duration_in_secs = QtCore.QTime(0, 0, 0).secsTo(w_qt_task_duration)
 
         # Checking if the task duration already exceeds the max task duration
-        if w_task_duration_in_secs >= glb_max_task_duration_in_sec:
+        if w_task_duration_in_secs > glb_max_task_duration_in_sec:
 
             # If yes, we create a new task and add the duration
             add_new_task(w_cell2_text)
@@ -709,7 +731,17 @@ def merge_selected_tasks():
             # Deleting the tasks and updating the "upper" one (since the list of merges is sorted etc...)
             w_nbr_of_rows_to_merge = len(lst_rows_to_merge)
 
+            # Merged tasks "text collector"
+            w_merged_text_collector = ""
+
             for w_row, w_text0, w_text1, w_text2 in lst_rows_to_merge:
+
+                # Concatenation of the tasks descriptions which will be merged
+                if w_merged_text_collector == "":
+                    if w_text2 != "":
+                        w_merged_text_collector = w_text2
+                else:
+                    w_merged_text_collector = w_merged_text_collector + "\n +" + w_text2
 
                 # All tasks must be deleted MINUS one
                 w_nbr_of_tasks_to_delete = w_nbr_of_tasks_to_delete + 1
@@ -722,7 +754,7 @@ def merge_selected_tasks():
                     w_qt_task_duration = QtCore.QTime.fromString(glb_00_00_time, glb_hh_mm_string_format)
                     w_task_duration = w_qt_task_duration.addSecs(w_total_duration_in_secs)
                     w_text1 = w_task_duration.toString(glb_hh_mm_string_format)
-                    update_lst_tasks_row_cells(w_row, w_text0, w_text1, w_text2)
+                    update_lst_tasks_row_cells(w_row, w_text0, w_text1, w_merged_text_collector)
 
             # Forcing the 1st displayed row to become the active task
             change_active_task(0, 0)
@@ -761,6 +793,10 @@ def call_ptt_edit_task():
 
     # Hiding the txt_row_number label (contents the row number edited)
     ptt_edit_task_dlg.txt_row_number.hide()
+
+    # Setting the "toggle" button to checked state
+    ptt_edit_task_dlg.btn_plus_minus.setChecked(True)
+    ptt_edit_task_dlg.btn_plus_minus.setText(glb_plus)
 
     # Initializing and running the edit window
     ptt_edit_task_dlg.show()
@@ -912,9 +948,9 @@ def ptt_edit_task_add_duration(p_value_in_min: int):
 def ptt_edit_task_update_btn_plus_minus_text():
 
     if ptt_edit_task_dlg.btn_plus_minus.isChecked() is True:
-        ptt_edit_task_dlg.btn_plus_minus.setText("+")
+        ptt_edit_task_dlg.btn_plus_minus.setText(glb_plus)
     else:
-        ptt_edit_task_dlg.btn_plus_minus.setText("-")
+        ptt_edit_task_dlg.btn_plus_minus.setText(glb_minus)
 
 
 # ------------------------------------------- #

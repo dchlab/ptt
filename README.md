@@ -1,13 +1,17 @@
 # ptt
 PTT - Python Time Tracker
 
+Copyright (C) 2019 David CH. All rights reserved.
+Portions Copyright (C) 2019 David CH. All rights reserved.
+For conditions of distribution and use, see LICENSE.TXT.
+
 What is PTT ?
 -------------
 
 It's just a simple time tracker to load and save tasks done or in progress.
 It consists in typing the task description and push Enter or the Add task button.
 
-Where is saved the data ?
+Where is the data saved ?
 -------------------------
 
 In the folder /data. The data is saved in the JSON format. The current data is saved in a file called "my_tasks.json".
