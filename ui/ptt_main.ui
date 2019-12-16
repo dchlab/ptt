@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>601</width>
-    <height>393</height>
+    <height>392</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>601</width>
-    <height>393</height>
+    <height>392</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>601</width>
-    <height>393</height>
+    <height>392</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,7 @@
     <normaloff>ptt.ico</normaloff>ptt.ico</iconset>
   </property>
   <property name="styleSheet">
-   <string notr="true">font: 9pt &quot;Segoe UI&quot;;</string>
+   <string notr="true">font: 8pt &quot;Segoe UI&quot;;</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTableWidget" name="lst_tasks">
@@ -39,7 +39,7 @@
       <x>10</x>
       <y>40</y>
       <width>581</width>
-      <height>289</height>
+      <height>288</height>
      </rect>
     </property>
     <property name="contextMenuPolicy">
@@ -78,6 +78,76 @@
     <attribute name="verticalHeaderMinimumSectionSize">
      <number>22</number>
     </attribute>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
+    <row>
+     <property name="text">
+      <string>New Row</string>
+     </property>
+    </row>
     <column>
      <property name="text">
       <string>     Démarrée le     </string>
@@ -140,7 +210,7 @@
      <x>0</x>
      <y>0</y>
      <width>601</width>
-     <height>21</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_ptt">
