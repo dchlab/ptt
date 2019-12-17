@@ -9,20 +9,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>562</width>
-    <height>361</height>
+    <width>621</width>
+    <height>392</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>562</width>
-    <height>361</height>
+    <width>621</width>
+    <height>392</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>562</width>
-    <height>361</height>
+    <width>621</width>
+    <height>392</height>
    </size>
   </property>
   <property name="font">
@@ -49,7 +49,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>541</width>
+      <width>601</width>
       <height>91</height>
      </rect>
     </property>
@@ -67,7 +67,7 @@
     <widget class="QTimeEdit" name="z_task_duration">
      <property name="geometry">
       <rect>
-       <x>430</x>
+       <x>490</x>
        <y>20</y>
        <width>101</width>
        <height>53</height>
@@ -100,9 +100,9 @@
     <widget class="QPushButton" name="btn_reset">
      <property name="geometry">
       <rect>
-       <x>330</x>
+       <x>380</x>
        <y>20</y>
-       <width>81</width>
+       <width>91</width>
        <height>53</height>
       </rect>
      </property>
@@ -122,9 +122,9 @@
     <widget class="QPushButton" name="btn_5min">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>160</x>
        <y>20</y>
-       <width>51</width>
+       <width>61</width>
        <height>23</height>
       </rect>
      </property>
@@ -144,9 +144,9 @@
     <widget class="QPushButton" name="btn_1min">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>20</y>
-       <width>51</width>
+       <width>61</width>
        <height>23</height>
       </rect>
      </property>
@@ -166,9 +166,9 @@
     <widget class="QPushButton" name="btn_4h">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>230</x>
        <y>50</y>
-       <width>51</width>
+       <width>61</width>
        <height>23</height>
       </rect>
      </property>
@@ -188,9 +188,9 @@
     <widget class="QPushButton" name="btn_1h">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>50</y>
-       <width>51</width>
+       <width>61</width>
        <height>23</height>
       </rect>
      </property>
@@ -210,9 +210,9 @@
     <widget class="QPushButton" name="btn_30min">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>300</x>
        <y>20</y>
-       <width>51</width>
+       <width>61</width>
        <height>23</height>
       </rect>
      </property>
@@ -232,9 +232,9 @@
     <widget class="QPushButton" name="btn_15min">
      <property name="geometry">
       <rect>
-       <x>200</x>
+       <x>230</x>
        <y>20</y>
-       <width>51</width>
+       <width>61</width>
        <height>23</height>
       </rect>
      </property>
@@ -254,9 +254,9 @@
     <widget class="QPushButton" name="btn_2h">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>160</x>
        <y>50</y>
-       <width>51</width>
+       <width>61</width>
        <height>23</height>
       </rect>
      </property>
@@ -276,9 +276,9 @@
     <widget class="QPushButton" name="btn_8h">
      <property name="geometry">
       <rect>
-       <x>260</x>
+       <x>300</x>
        <y>50</y>
-       <width>51</width>
+       <width>61</width>
        <height>23</height>
       </rect>
      </property>
@@ -300,13 +300,13 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>53</width>
+       <width>61</width>
        <height>53</height>
       </rect>
      </property>
      <property name="font">
       <font>
-       <pointsize>14</pointsize>
+       <pointsize>16</pointsize>
        <weight>50</weight>
        <bold>false</bold>
       </font>
@@ -325,9 +325,9 @@
    <widget class="QPushButton" name="btn_save">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>330</y>
-      <width>111</width>
+      <x>490</x>
+      <y>360</y>
+      <width>121</width>
       <height>23</height>
      </rect>
     </property>
@@ -346,8 +346,8 @@
      <rect>
       <x>10</x>
       <y>110</y>
-      <width>541</width>
-      <height>211</height>
+      <width>601</width>
+      <height>241</height>
      </rect>
     </property>
     <property name="font">
@@ -365,9 +365,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
-       <width>521</width>
-       <height>141</height>
+       <y>80</y>
+       <width>581</width>
+       <height>151</height>
       </rect>
      </property>
      <property name="font">
@@ -387,9 +387,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>40</y>
-       <width>371</width>
-       <height>22</height>
+       <y>50</y>
+       <width>421</width>
+       <height>31</height>
       </rect>
      </property>
      <property name="font">
@@ -410,8 +410,8 @@
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>361</width>
-       <height>22</height>
+       <width>421</width>
+       <height>31</height>
       </rect>
      </property>
      <property name="font">
@@ -430,16 +430,16 @@
     <widget class="QDateTimeEdit" name="z_task_dth">
      <property name="geometry">
       <rect>
-       <x>380</x>
+       <x>440</x>
        <y>20</y>
        <width>151</width>
-       <height>22</height>
+       <height>31</height>
       </rect>
      </property>
      <property name="font">
       <font>
        <family>Segoe UI</family>
-       <pointsize>8</pointsize>
+       <pointsize>9</pointsize>
        <weight>50</weight>
        <italic>false</italic>
        <bold>false</bold>

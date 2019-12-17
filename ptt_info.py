@@ -17,7 +17,7 @@
 # Class PttAppInfo : just for storing externally the application information (version, author etc...)
 class PttAppInfo:
     def __init__(self):
-        self.version = "0.2.4 (16/12/2019)"
+        self.version = "0.2.5 (17/12/2019)"
         self.author = "dchlab (David CH.)"
         self.github = "https://github.com/dchlab"
         self.dependencies = "PyQt5"
