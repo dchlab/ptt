@@ -23,6 +23,8 @@
 * User data files used :
 * - /data/my_tasks.json                 Tasks saved in a JSON format
 * - /data/my_tasks.backup               Backup of the previous file (at startup)
+* Miscellaneous files used/generated :
+* - /data/ptt.lock                      Used as pseudo lock file
 * --------------------------------------------------------------------------------- *
 To build the application from PyInstaller, go in the ptt (root) folder then :
 pyinstaller ptt_main.py -w -n ptt.exe --add-data="ui\*.*";"ui"
@@ -44,6 +46,7 @@ from ptt_info import PttAppInfo
 import sys
 import os
 import json
+import datetime
 
 
 # ------------------------------------------- #
@@ -65,11 +68,12 @@ def ptt_resource_path(p_relative_path: str):
 # Classes
 # ------------------------------------------- #
 
-# Class PttFiles : contents the file names used in the application
+# Class PttFiles : contents the data file names used in the application
 class PttFiles:
     def __init__(self):
         self.my_tasks_json = "data/my_tasks.json"
         self.my_tasks_backup = "data/my_tasks.backup"
+        self.ptt_lock = "data/ptt.lock"
 
 
 # Class PttResourcesFiles : contents the file names used for the resources in the application
@@ -115,6 +119,7 @@ ptt_edit_task_dlg = uic.loadUi(ptt_edit_task_ui_path)
 glb_ptt_app_info = PttAppInfo()
 
 # Global variables for intervals and others duration
+glb_timer_ptt_lock_interval_in_msec = 30000
 glb_timer_interval_in_msec = 60000
 glb_default_added_duration_in_sec = 60
 glb_max_task_duration_in_sec = 28800
@@ -122,6 +127,10 @@ glb_max_task_duration_in_sec = 28800
 # Active task timer management
 glb_active_task_timer = QtCore.QTimer()
 glb_active_task_timer.start(glb_timer_interval_in_msec)
+
+# ptt.lock timer management
+glb_ptt_lock_timer = QtCore.QTimer()
+glb_ptt_lock_timer.start(glb_timer_ptt_lock_interval_in_msec)
 
 # Empty string
 glb_empty_str = ""
@@ -169,6 +178,8 @@ glb_about_info = "PTT - Python Time Tracker\nVersion : {}\n\nAuteur : {}\nGithub
 glb_locale_fr_FR = "fr_FR"
 
 # Miscellaneous texts (for message boxes etc...)
+glb_popup_title_generic_error = "PTT - Python Time Tracker"
+glb_popup_text_app_is_already_running = "PTT est déjà en cours d'exécution."
 glb_popup_title_all_tasks_deletion = "ATTENTION !"
 glb_popup_question_all_tasks_deletion = "Voulez-vous supprimer TOUTES les tâches ?"
 glb_popup_title_deletion = "Suppression"
@@ -217,6 +228,129 @@ ptt_main_dlg.lst_tasks.addAction(actionEdit)
 ptt_main_dlg.lst_tasks.addAction(actionMerge)
 ptt_main_dlg.lst_tasks.addAction(actionSeparator)
 ptt_main_dlg.lst_tasks.addAction(actionDelete)
+
+
+# ------------------------------------------- #
+# Functions used for pseudo locking the app
+# ------------------------------------------- #
+
+# Function check_ptt_lock_existence : checks if the ptt.lock file exists and returns a boolean and the 1st line found
+def check_ptt_lock_existence():
+
+    # Miscellaneous initializations
+    w_ptt_files = PttFiles()
+    w_file_exists = False
+    w_first_line = ""
+
+    # Checking if the ptt.lock file can be found and retrieving 1st line of the file
+    # Note : .rstrip() was added to remove the extra control characters at the end of the line
+
+    try:
+        with open(w_ptt_files.ptt_lock, "r") as file:
+            w_file_exists = True
+            w_first_line = file.readline().rstrip()
+    except:
+        print("check_ptt_lock_existence : file '{}' not found".format(w_ptt_files.ptt_lock))
+
+    # Returns the file existence boolean and the string of the 1st line
+    return w_file_exists, w_first_line
+
+
+# Function write_ptt_lock : creates or overwrites the ptt.lock file
+def write_ptt_lock():
+
+    # Miscellaneous initializations
+    w_ptt_files = PttFiles()
+
+    # Trying to overwrite the file with a timestamp
+    try:
+        with open(w_ptt_files.ptt_lock, "w") as file:
+            file.write(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
+    except:
+        print("write_ptt_lock : cannot write in the '{}' file".format(w_ptt_files.ptt_lock))
+
+
+# Function remove_ptt_lock : removes the ptt.lock file
+def remove_ptt_lock():
+
+    # Miscellaneous initializations
+    w_ptt_files = PttFiles()
+
+    # Trying to remove the file
+    try:
+        os.remove(w_ptt_files.ptt_lock)
+    except:
+        print("remove_ptt_lock : cannot remove the '{}' file".format(w_ptt_files.ptt_lock))
+
+
+# Function ptt_start_allowed : checking if ptt is allowed to start with the help of ptt.lock
+def ptt_start_allowed():
+
+    # ----------------------------------------------------------------------------------- #
+    # Important note :
+    # ----------------------------------------------------------------------------------- #
+    # We are allowed to run ptt if the timestamp (format %Y%m%d%H%M%S = YYYYMMDDHHMMSS)
+    # found ptt.lock is older than 1 minute ago.
+    # If the file doesn't exist or if the file contains crap, it's considered as invalid
+    # and which means we can overwrite it with the current timestamp.
+    # Note that the ptt.lock file is updated every 30 seconds with the help of a timer,
+    # in another part of the code.
+    # PS : Windows/DOS doesn't allow to really lock files like it's done in Unix/Posix...
+    # ----------------------------------------------------------------------------------- #
+
+    # Miscellaneous initializations
+    w_ptt_files = PttFiles()
+    w_ptt_start_allowed = False
+    w_datetime_is_valid = False
+    w_calculation_is_valid = False
+
+    # Checking if the file is found and its contents
+    w_file_exists, w_first_line = check_ptt_lock_existence()
+
+    # If found...
+    if w_file_exists is True:
+
+        # Retrieving the 1st line which contains a timestamp
+        try:
+            w_datetime_in_file = datetime.datetime.strptime(w_first_line, "%Y%m%d%H%M%S")
+            w_datetime_is_valid = True
+        except:
+            print("ptt_start_allowed : invalid data '{}' found in '{}' file".format(w_first_line, w_ptt_files.ptt_lock))
+
+        # If the datetime found is OK...
+        if w_datetime_is_valid is True:
+
+            # Retrieving the current datetime in the format we need
+            w_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+            w_current_datetime = datetime.datetime.strptime(w_now, "%Y%m%d%H%M%S")
+
+            # Trying to calculate the datetime difference between the current and the file one
+            try:
+                w_datetime_difference = w_current_datetime - w_datetime_in_file
+                w_calculation_is_valid = True
+            except:
+                print("ptt_start_allowed : cannot calculate the datetime difference !")
+
+            # If the calculation is OK and if we have at least a difference of 60 seconds,
+            # we can grant the access
+
+            if (w_calculation_is_valid is True) and w_datetime_difference.seconds >= 60:
+                w_ptt_start_allowed = True
+
+        else:
+            # Otherwise, if the data isn't valid, we force the access anyway
+            w_ptt_start_allowed = True
+
+    else:
+        # Otherwise, it means everything is clear and we can grant the access
+        w_ptt_start_allowed = True
+
+    # If we are allowed to start ptt, we create/overwrite the "lock" file
+    if w_ptt_start_allowed is True:
+        write_ptt_lock()
+
+    # Returning the boolean
+    return w_ptt_start_allowed
 
 
 # ------------------------------------------- #
@@ -861,7 +995,7 @@ def save_tasks_to_file():
 
     except IOError:
         # For console debugging
-        print("Cannot write in the '{}' file".format(w_ptt_files.my_tasks_json))
+        print("save_tasks_to_file : cannot write in the '{}' file".format(w_ptt_files.my_tasks_json))
 
 
 # Function load_tasks_from_file : loads my tasks to the "my_tasks.json" file
@@ -878,11 +1012,11 @@ def load_tasks_from_file():
                 w_tasks = json.load(file)
             except:
                 # For console debugging
-                print("Error while reading json data in '{}'".format(w_ptt_files.my_tasks_json))
+                print("load_tasks_from_file : error while reading json data in '{}'".format(w_ptt_files.my_tasks_json))
 
     except IOError:
         # For console debugging
-        print("Cannot open the '{}' file".format(w_ptt_files.my_tasks_json))
+        print("load_tasks_from_file : cannot open the '{}' file".format(w_ptt_files.my_tasks_json))
 
     # For each task record found in w_tasks, loading retrieving the text
     for w_task_record in w_tasks["tasks"]:
@@ -911,7 +1045,7 @@ def create_tasks_backup():
     try:
         copyfile(w_ptt_files.my_tasks_json, w_ptt_files.my_tasks_backup)
     except FileNotFoundError:
-        print("File'{}' not found".format(w_ptt_files.my_tasks_json))
+        print("create_tasks_backup : file '{}' not found".format(w_ptt_files.my_tasks_json))
 
 
 # ------------------------------------------- #
@@ -1001,9 +1135,15 @@ def ptt_edit_task_send_data():
 
 
 # ------------------------------------------- #
+# Checking if we can start PTT (pseudo mutex)
+# ------------------------------------------- #
+
+w_is_ptt_start_allowed = ptt_start_allowed()
+
+# ------------------------------------------- #
 # Main loop
 # ------------------------------------------- #
-if __name__ == "__main__":
+if __name__ == "__main__" and (w_is_ptt_start_allowed is True):
 
     # Trying to create a backup of the "my_tasks.json" file (at application startup only)
     create_tasks_backup()
@@ -1041,76 +1181,95 @@ if __name__ == "__main__":
 # Signals and connections (ptt_main)
 # ------------------------------------------- #
 
-# Enabling or not the button to add a task
-ptt_main_dlg.z_task_to_add.textChanged.connect(enable_btn_task_add)
+if w_is_ptt_start_allowed is True:
 
-# Adding a new task to the lst_tasks list with the appropriate button
-ptt_main_dlg.btn_task_add.clicked.connect(lambda: add_new_task(ptt_main_dlg.z_task_to_add.text()))
+    # Enabling or not the button to add a task
+    ptt_main_dlg.z_task_to_add.textChanged.connect(enable_btn_task_add)
 
-# Adding a new task to the lst_tasks list when Enter key is pressed
-ptt_main_dlg.z_task_to_add.returnPressed.connect(lambda: add_new_task(ptt_main_dlg.z_task_to_add.text()))
+    # Adding a new task to the lst_tasks list with the appropriate button
+    ptt_main_dlg.btn_task_add.clicked.connect(lambda: add_new_task(ptt_main_dlg.z_task_to_add.text()))
 
-# Emptying the lst_tasks list of all of its rows
-ptt_main_dlg.btn_lst_tasks_empty.clicked.connect(empty_lst_tasks)
+    # Adding a new task to the lst_tasks list when Enter key is pressed
+    ptt_main_dlg.z_task_to_add.returnPressed.connect(lambda: add_new_task(ptt_main_dlg.z_task_to_add.text()))
 
-# Turning a double clicked row as the active task on the 1st row
-ptt_main_dlg.lst_tasks.cellDoubleClicked.connect(change_active_task)
+    # Emptying the lst_tasks list of all of its rows
+    ptt_main_dlg.btn_lst_tasks_empty.clicked.connect(empty_lst_tasks)
 
-# Reading the cells contents of a row selected and saves the info in the z_ global variables
-ptt_main_dlg.lst_tasks.cellPressed.connect(read_current_task)
+    # Turning a double clicked row as the active task on the 1st row
+    ptt_main_dlg.lst_tasks.cellDoubleClicked.connect(change_active_task)
 
-# Refreshing the popup actions of the list
-ptt_main_dlg.lst_tasks.itemSelectionChanged.connect(enable_lst_tasks_popup_actions)
+    # Reading the cells contents of a row selected and saves the info in the z_ global variables
+    ptt_main_dlg.lst_tasks.cellPressed.connect(read_current_task)
 
-# Timer signal to manage the time logged on the active task
-glb_active_task_timer.timeout.connect(auto_increment_active_task)
+    # Refreshing the popup actions of the list
+    ptt_main_dlg.lst_tasks.itemSelectionChanged.connect(enable_lst_tasks_popup_actions)
 
-# Popup / actionActivate : activating the task selected
-actionActivate.triggered.connect(popup_change_active_task)
+    # Timer signal to manage the time logged on the active task
+    glb_active_task_timer.timeout.connect(auto_increment_active_task)
 
-# Popup / actionEdit : editing the task (datetime started on, duration, description)
-actionEdit.triggered.connect(call_ptt_edit_task)
+    # Timer signal to manage the ptt.lock (works like a heartbeat)
+    glb_ptt_lock_timer.timeout.connect(write_ptt_lock)
 
-# Popup / actionMerge : merging the selected tasks (so at least 2)
-actionMerge.triggered.connect(merge_selected_tasks)
+    # Popup / actionActivate : activating the task selected
+    actionActivate.triggered.connect(popup_change_active_task)
 
-# Popup / actionDelete : deleting the selected tasks
-actionDelete.triggered.connect(delete_selected_tasks)
+    # Popup / actionEdit : editing the task (datetime started on, duration, description)
+    actionEdit.triggered.connect(call_ptt_edit_task)
 
-# Menu bar, menu PTT / actionQuit : closing the application
-ptt_main_dlg.actionQuit.triggered.connect(ptt_main_dlg.close)
+    # Popup / actionMerge : merging the selected tasks (so at least 2)
+    actionMerge.triggered.connect(merge_selected_tasks)
 
-# Menu bar, menu PTT / actionAbout : display the "About" information popup
-ptt_main_dlg.actionAbout.triggered.connect(lambda: info_popup_ok(glb_about_title, glb_about_info))
+    # Popup / actionDelete : deleting the selected tasks
+    actionDelete.triggered.connect(delete_selected_tasks)
+
+    # Menu bar, menu PTT / actionQuit : closing the application
+    ptt_main_dlg.actionQuit.triggered.connect(ptt_main_dlg.close)
+
+    # Menu bar, menu PTT / actionAbout : display the "About" information popup
+    ptt_main_dlg.actionAbout.triggered.connect(lambda: info_popup_ok(glb_about_title, glb_about_info))
 
 # ------------------------------------------- #
 # Signals and connections (ptt_edit_task)
 # ------------------------------------------- #
 
-# Resetting the duration displayed in the ptt_edit_task modal window
-ptt_edit_task_dlg.btn_reset.clicked.connect(ptt_edit_task_duration_reset)
+if w_is_ptt_start_allowed is True:
 
-# Adding duration to the QTimeEdit field
-ptt_edit_task_dlg.btn_1min.clicked.connect(lambda: ptt_edit_task_add_duration(1))
-ptt_edit_task_dlg.btn_5min.clicked.connect(lambda: ptt_edit_task_add_duration(5))
-ptt_edit_task_dlg.btn_15min.clicked.connect(lambda: ptt_edit_task_add_duration(15))
-ptt_edit_task_dlg.btn_30min.clicked.connect(lambda: ptt_edit_task_add_duration(30))
-ptt_edit_task_dlg.btn_1h.clicked.connect(lambda: ptt_edit_task_add_duration(60))
-ptt_edit_task_dlg.btn_2h.clicked.connect(lambda: ptt_edit_task_add_duration(120))
-ptt_edit_task_dlg.btn_4h.clicked.connect(lambda: ptt_edit_task_add_duration(240))
-ptt_edit_task_dlg.btn_8h.clicked.connect(lambda: ptt_edit_task_add_duration(480))
+    # Resetting the duration displayed in the ptt_edit_task modal window
+    ptt_edit_task_dlg.btn_reset.clicked.connect(ptt_edit_task_duration_reset)
 
-# Changing the text of the toggle button "+/-"
-ptt_edit_task_dlg.btn_plus_minus.toggled.connect(lambda: ptt_edit_task_update_btn_plus_minus_text())
+    # Adding duration to the QTimeEdit field
+    ptt_edit_task_dlg.btn_1min.clicked.connect(lambda: ptt_edit_task_add_duration(1))
+    ptt_edit_task_dlg.btn_5min.clicked.connect(lambda: ptt_edit_task_add_duration(5))
+    ptt_edit_task_dlg.btn_15min.clicked.connect(lambda: ptt_edit_task_add_duration(15))
+    ptt_edit_task_dlg.btn_30min.clicked.connect(lambda: ptt_edit_task_add_duration(30))
+    ptt_edit_task_dlg.btn_1h.clicked.connect(lambda: ptt_edit_task_add_duration(60))
+    ptt_edit_task_dlg.btn_2h.clicked.connect(lambda: ptt_edit_task_add_duration(120))
+    ptt_edit_task_dlg.btn_4h.clicked.connect(lambda: ptt_edit_task_add_duration(240))
+    ptt_edit_task_dlg.btn_8h.clicked.connect(lambda: ptt_edit_task_add_duration(480))
 
-# Navigation management between ptt_main <-> ptt_edit_task (calls, I/O parameters...)
-ptt_main_calling_edit.edit_task_signal.connect(ptt_edit_task_get_data)
-ptt_edit_task_dlg.btn_save.clicked.connect(ptt_edit_task_send_data)
-ptt_edit_task_saving.edit_task_signal.connect(update_task_after_edit)
+    # Changing the text of the toggle button "+/-"
+    ptt_edit_task_dlg.btn_plus_minus.toggled.connect(lambda: ptt_edit_task_update_btn_plus_minus_text())
+
+    # Navigation management between ptt_main <-> ptt_edit_task (calls, I/O parameters...)
+    ptt_main_calling_edit.edit_task_signal.connect(ptt_edit_task_get_data)
+    ptt_edit_task_dlg.btn_save.clicked.connect(ptt_edit_task_send_data)
+    ptt_edit_task_saving.edit_task_signal.connect(update_task_after_edit)
 
 # ------------------------------------------- #
 # Initializing and running the main window
 # ------------------------------------------- #
 
-ptt_main_dlg.show()
-ptt_main_app.exec()
+if w_is_ptt_start_allowed is True:
+
+    # Initializing and running the main window
+    ptt_main_dlg.show()
+    ptt_main_app.exec()
+
+    # Removing the ptt.lock file
+    # Note : even if the file isn't removed (ex: app crash), it becomes obsolete if not refreshed within 1 min
+
+    remove_ptt_lock()
+
+else:
+    # The application is already running
+    error_popup_ok(glb_popup_title_generic_error, glb_popup_text_app_is_already_running)
