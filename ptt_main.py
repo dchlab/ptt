@@ -5,7 +5,7 @@
 * --------------------------------------------------------------------------------- *
 * Application name : PTT (Python Time Tracker)
 * Script name : ptt_main.py
-* Created by DCH (June / December 2019)
+* Created by DCH (Started on June 2019 -> 2020)
 * --------------------------------------------------------------------------------- *
 * Modified by XXX on the DD/MM/YYYY
 * --------------------------------------------------------------------------------- *
@@ -331,11 +331,14 @@ def ptt_start_allowed():
             except:
                 print("ptt_start_allowed : cannot calculate the datetime difference !")
 
-            # If the calculation is OK and if we have at least a difference of 60 seconds,
-            # we can grant the access
+            # If the calculation is OK and if we have at least a difference of 60 seconds, we can grant the access
+            # Note : the tests 1) difference in days != 0 and 2) abs() are here to strengthen the test, just in case
+            # there would be a gap of days or if a "future" datetime would be found in the file (= aka a "troll value")
 
-            if (w_calculation_is_valid is True) and w_datetime_difference.seconds >= 60:
-                w_ptt_start_allowed = True
+            if w_calculation_is_valid is True:
+                if w_datetime_difference.days != 0 or \
+                        (w_datetime_difference.days == 0 and abs(w_datetime_difference.seconds) >= 60):
+                    w_ptt_start_allowed = True
 
         else:
             # Otherwise, if the data isn't valid, we force the access anyway
@@ -936,6 +939,9 @@ def call_ptt_edit_task():
     ptt_edit_task_dlg.show()
     ptt_edit_task_app.exec()
 
+    # Centering the edit task window (on the screen where edit window screen is called)
+    ptt_edit_task_center_window()
+
     # Replacing the focus at the top
     default_focus()
 
@@ -1051,6 +1057,25 @@ def create_tasks_backup():
 # ------------------------------------------- #
 # Functions of ptt_edit_task window
 # ------------------------------------------- #
+
+# ptt_edit_task / Function ptt_edit_task_center_window : centers the edit task window on the right monitor
+def ptt_edit_task_center_window():
+
+    # Retrieving 1st the frame geometry of the edit task ptt window (in order to get the QRect class)
+    w_edit_task_dlg_frame_geometry = ptt_edit_task_dlg.frameGeometry()
+
+    # Retrieving the current cursor location to get the RIGHT screen number we need
+    w_screen_number = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+
+    # Retrieving the center point of the availableGeometry (= the actual screen geometry we can use, w/o task bar...)
+    w_center_point = QtWidgets.QApplication.desktop().availableGeometry(w_screen_number).center()
+
+    # Centering/moving the temp frame geometry based from the MAIN window to the center point
+    w_edit_task_dlg_frame_geometry.moveCenter(w_center_point)
+
+    # Finally moving the edit task location on the top left of the QRect placed in the middle of the right screen
+    ptt_edit_task_dlg.move(w_edit_task_dlg_frame_geometry.topLeft())
+
 
 # ptt_edit_task / Function ptt_edit_task_duration_reset : resets the duration value in the modal window
 def ptt_edit_task_duration_reset():
