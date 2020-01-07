@@ -23,7 +23,7 @@ from PyQt5.QtCore import QT_VERSION_STR
 # Class PttAppInfo : just for storing externally the application information (version, author etc...)
 class PttAppInfo:
     def __init__(self):
-        self.version = "0.2.7 (04/01/2020)"
+        self.version = "0.2.8"
         self.author = "dchlab (David CH.)"
         self.github = "https://github.com/dchlab"
         self.dependencies = "PyQt {}".format(QT_VERSION_STR)

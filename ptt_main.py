@@ -64,11 +64,40 @@ def ptt_resource_path(p_relative_path: str):
     return os.path.join(w_base_path, p_relative_path)
 
 
+# Function convert_task_duration_secs_to_dhms : converts a duration in secs into days/hours/minutes/secs
+def convert_task_duration_secs_to_dhms(p_duration_in_secs: int, p_working_day_duration_in_secs: int):
+
+    # Miscellaneous initializations
+    w_task_duration = TaskDuration()
+    w_secs_in_a_day = 86400
+
+    # Calculating the duration in days (for a working day duration if it's filled, 24*3600 secs otherwise)
+    if p_working_day_duration_in_secs > 0:
+        w_task_duration.days = p_duration_in_secs // p_working_day_duration_in_secs
+        w_task_duration.seconds = p_duration_in_secs % p_working_day_duration_in_secs
+    else:
+        w_task_duration.days = p_duration_in_secs // w_secs_in_a_day
+        w_task_duration.seconds = p_duration_in_secs % w_secs_in_a_day
+
+    # Calculating the duration in hours (with the remainder)
+    if w_task_duration.seconds > 0:
+        w_task_duration.hours = w_task_duration.seconds // 3600
+        w_task_duration.seconds = w_task_duration.seconds % 3600
+
+    # Calculating the duration in minutes (with the remainder)
+    if w_task_duration.seconds > 0:
+        w_task_duration.minutes = w_task_duration.seconds // 60
+        w_task_duration.seconds = w_task_duration.seconds % 60
+
+    # Returning the values in the form of a class
+    return w_task_duration
+
+
 # ------------------------------------------- #
 # Classes
 # ------------------------------------------- #
 
-# Class PttFiles : contents the data file names used in the application
+# Class PttFiles : contains the data file names used in the application
 class PttFiles:
     def __init__(self):
         self.my_tasks_json = "data/my_tasks.json"
@@ -76,12 +105,21 @@ class PttFiles:
         self.ptt_lock = "data/ptt.lock"
 
 
-# Class PttResourcesFiles : contents the file names used for the resources in the application
+# Class PttResourcesFiles : contains the file names used for the resources in the application
 class PttResourcesFiles:
     def __init__(self):
         self.main_ui = "ui/ptt_main.ui"
         self.edit_task_ui = "ui/ptt_edit_task.ui"
         self.ptt_ico = "ui/ptt.ico"
+
+
+# Class TaskDuration : contains the task duration members
+class TaskDuration:
+    def __init__(self):
+        self.days = 0
+        self.hours = 0
+        self.minutes = 0
+        self.seconds = 0
 
 
 # Object for edit_task_signal calling parameters between windows
@@ -191,6 +229,16 @@ glb_popup_text_merging_failed = "La durée totale excède {} heures.".format(str
 glb_Yes_text = "Oui"
 glb_No_text = "Non"
 glb_Ok_text = "OK"
+
+# Last backup performed at
+glb_last_backup_performed_at = "Dernière sauvegarde effectuée à"
+
+# Variables related to the status bar
+glb_status_bar_latest_backup = ""
+glb_working_time_duration = "Durée travaillée"
+glb_day = "jour"
+glb_days = "jours"
+glb_no_time_duration = "nulle"
 
 # ------------------------------------------- #
 # Main window global variables (cells read)
@@ -359,6 +407,94 @@ def ptt_start_allowed():
 # ------------------------------------------- #
 # Functions of ptt_main window
 # ------------------------------------------- #
+
+# Function update_status_bar_message : displays the text received in parameter
+def update_status_bar_message(p_message: str):
+    ptt_main_dlg.ptt_statusbar.showMessage(p_message)
+
+
+# Function update_status_bar_latest_backup : generates and updates the status bar with "Last backup performed at HH:MM."
+def update_status_bar_latest_backup():
+
+    # Retrieving the numbers of row currently selected
+    w_nbr_rows_selected = len(ptt_main_dlg.lst_tasks.selectionModel().selectedRows())
+
+    # Declaring glb_status_bar_latest_backup as global since we will update its contents
+    global glb_status_bar_latest_backup
+
+    # Generating the backup message
+    glb_status_bar_latest_backup = glb_last_backup_performed_at + " " + datetime.datetime.now().strftime("%H:%M.")
+
+    # We only update the status bar with the latest backup message if there are less than 2 rows selected
+    # (= maybe the user wants to know the sum of the working duration only, so we don't loose the current status)
+    # Otherwise, we refresh the duration of the selected tasks
+
+    if w_nbr_rows_selected < 2:
+        update_status_bar_message(glb_status_bar_latest_backup)
+    else:
+        update_status_bar_selected_tasks_duration()
+
+
+# Function display_status_bar_latest_backup : displays the latest backup message performed in the status bar
+def display_status_bar_latest_backup():
+    update_status_bar_message(glb_status_bar_latest_backup)
+
+
+# Function update_status_bar_selected_tasks_duration : generates and displays the working time of the selected tasks
+def update_status_bar_selected_tasks_duration():
+
+    # Miscellaneous initializations
+    w_message = glb_working_time_duration + " :"
+    w_txt_days = ""
+    w_txt_hours = ""
+    w_txt_mins = ""
+    w_txt_secs = ""
+
+    # Retrieving the selected tasks working duration in seconds in converting them into a class
+    w_dhms = convert_task_duration_secs_to_dhms(sum_selected_tasks_duration(), glb_max_task_duration_in_sec)
+
+    # Generating the "days" part of the text we need (with singular and plural)
+    if w_dhms.days > 0:
+        if w_dhms.days == 1:
+            w_txt_days = "{} {}".format(w_dhms.days, glb_day)
+        else:
+            w_txt_days = "{} {}".format(w_dhms.days, glb_days)
+
+    # Generating the "hours" part of the text we need
+    if w_dhms.hours > 0:
+        w_txt_hours = "{}h".format(w_dhms.hours)
+
+    # Generating the "minutes" part of the text we need
+    if w_dhms.minutes > 0:
+        w_txt_mins = "{}min".format(w_dhms.minutes)
+
+    # Generating the "seconds" part of the text we need
+    if w_dhms.seconds > 0:
+        w_txt_secs = "{}s".format(w_dhms.seconds)
+
+    # Assembling the final message...
+    if w_txt_days != "":
+        w_message = w_message + " " + w_txt_days
+
+    if w_txt_hours != "":
+        w_message = w_message + " " + w_txt_hours
+
+    if w_txt_mins != "":
+        w_message = w_message + " " + w_txt_mins
+
+    if w_txt_secs != "":
+        w_message = w_message + " " + w_txt_secs
+
+    # If we have no time duration, we need to say it
+    if w_txt_days == "" and w_txt_hours == "" and w_txt_mins == "" and w_txt_secs == "":
+        w_message = w_message + " " + glb_no_time_duration
+
+    # Completing the sentence with a period
+    w_message = w_message + "."
+
+    # Finally, updating the status bar with the generated message
+    update_status_bar_message(w_message)
+
 
 # Function default_focus : puts focus back on the entry input field
 def default_focus():
@@ -744,6 +880,47 @@ def auto_increment_active_task():
     add_duration_to_task_at_row(0, glb_default_added_duration_in_sec)
 
 
+# Function sum_selected_tasks_duration : sums up the selected tasks duration and returns a result in secs
+def sum_selected_tasks_duration():
+
+    # Miscellaneous initializations
+    w_selected_task_duration_in_secs = 0
+
+    # Temporary list of tasks selected (tuples of (row, text0, text1, text2) )
+    lst_selected_tasks = []
+
+    # Making sure we have some rows at least...
+    nbr_rows = ptt_main_dlg.lst_tasks.rowCount()
+
+    # If having some rows in the list
+    if nbr_rows > 0:
+
+        # Memorizing the selected tasks in a list
+        indexes = ptt_main_dlg.lst_tasks.selectionModel().selectedRows()
+        for index in sorted(indexes):
+
+            # Retrieves the text of the 3 cells from the selected line (any row but fixed columns values)
+            w_cell0_text, w_cell1_text, w_cell2_text = get_lst_tasks_row_cells(index.row())
+
+            # Saving the tuple in the list
+            lst_selected_tasks.append((index.row(), w_cell0_text, w_cell1_text, w_cell2_text))
+
+        # Calculating the total duration in seconds for the selected tasks
+        for w_row, w_text0, w_text1, w_text2 in lst_selected_tasks:
+
+            # Turning the text of cell1 in 'hh:mm' format into true Qtime format
+            w_qt_task_duration = QtCore.QTime.fromString(w_text1, glb_hh_mm_string_format)
+
+            # Converting the Qtime into seconds (seconds from 00:00:00 to the Qtime value :p )
+            w_task_duration_in_secs = QtCore.QTime(0, 0, 0).secsTo(w_qt_task_duration)
+
+            # Add the duration read to the total task duration
+            w_selected_task_duration_in_secs = w_selected_task_duration_in_secs + w_task_duration_in_secs
+
+        # Finally returning the duration
+        return w_selected_task_duration_in_secs
+
+
 # Function enable_lst_tasks_popup_actions : makes actions visible or not for the lst_tasks list
 def enable_lst_tasks_popup_actions():
 
@@ -792,6 +969,12 @@ def enable_lst_tasks_popup_actions():
         # actionDelete is visible if at least one row is selected
         if w_nbr_rows_selected > 0:
             actionDelete.setVisible(True)
+
+        # Depending on the rows selected, we display either the duration of the tasks selected or the latest backup time
+        if w_nbr_rows_selected > 1:
+            update_status_bar_selected_tasks_duration()
+        else:
+            display_status_bar_latest_backup()
 
 
 # Function popup_change_active_task : activates a task through the appropriate popup action
@@ -999,6 +1182,9 @@ def save_tasks_to_file():
             # indent=4 for pretty json output, unicode and no \u characters
             json.dump(w_tasks, file, indent=4, ensure_ascii=False)
 
+            # Updating the status bar message when the backup is performed
+            update_status_bar_latest_backup()
+
     except IOError:
         # For console debugging
         print("save_tasks_to_file : cannot write in the '{}' file".format(w_ptt_files.my_tasks_json))
@@ -1035,10 +1221,12 @@ def load_tasks_from_file():
         update_lst_tasks_row_cells(
             w_row_count, w_task_record["started_on"], w_task_record["duration"], w_task_record["description"])
 
+    """ Portion of code not needed anymore (since we add a new task at startup and it does activation + backup then)
     # Forcing the 1st displayed row to become the active task if at least one record loaded
     w_row_count = ptt_main_dlg.lst_tasks.rowCount()
     if w_row_count > 0:
         change_active_task(0, 0)
+    """
 
 
 # Function create_tasks_backup : creates a backup file of the "my_tasks.json" file

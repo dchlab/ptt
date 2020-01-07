@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>621</width>
-    <height>392</height>
+    <height>409</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>621</width>
-    <height>392</height>
+    <height>409</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>621</width>
-    <height>392</height>
+    <height>409</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -32,7 +32,7 @@
   <property name="styleSheet">
    <string notr="true">font: 8pt &quot;Segoe UI&quot;;</string>
   </property>
-  <widget class="QWidget" name="centralwidget">
+  <widget class="QWidget" name="ptt_centralwidget">
    <widget class="QTableWidget" name="lst_tasks">
     <property name="geometry">
      <rect>
@@ -158,7 +158,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar_ptt">
+  <widget class="QMenuBar" name="ptt_menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -167,7 +167,7 @@
      <height>19</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu_ptt">
+   <widget class="QMenu" name="ptt_menu">
     <property name="title">
      <string>PTT</string>
     </property>
@@ -175,16 +175,27 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
-   <addaction name="menu_ptt"/>
+   <addaction name="ptt_menu"/>
   </widget>
+  <widget class="QStatusBar" name="ptt_statusbar"/>
   <action name="actionAbout">
    <property name="text">
     <string>A propos de PTT</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+    </font>
    </property>
   </action>
   <action name="actionQuit">
    <property name="text">
     <string>Quitter</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+    </font>
    </property>
   </action>
  </widget>
