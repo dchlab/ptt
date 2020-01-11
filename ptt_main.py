@@ -206,6 +206,7 @@ glb_actionActivate_text = "Activer"
 glb_actionEdit_text = "Modifier"
 glb_actionMerge_text = "Fusionner"
 glb_actionDelete_text = "Supprimer"
+glb_actionDeleteAll_text = "Tout supprimer"
 
 # Texts for the "About" popup
 glb_about_title = "A propos de PTT"
@@ -266,6 +267,7 @@ actionActivate = QAction(glb_actionActivate_text, None)
 actionEdit = QAction(glb_actionEdit_text, None)
 actionMerge = QAction(glb_actionMerge_text, None)
 actionDelete = QAction(glb_actionDelete_text, None)
+actionDeleteAll = QAction(glb_actionDeleteAll_text, None)
 
 # Changing the activate text action to bold
 actionActivate.setFont(bold_font)
@@ -276,6 +278,7 @@ ptt_main_dlg.lst_tasks.addAction(actionEdit)
 ptt_main_dlg.lst_tasks.addAction(actionMerge)
 ptt_main_dlg.lst_tasks.addAction(actionSeparator)
 ptt_main_dlg.lst_tasks.addAction(actionDelete)
+ptt_main_dlg.lst_tasks.addAction(actionDeleteAll)
 
 
 # ------------------------------------------- #
@@ -670,8 +673,8 @@ def empty_lst_tasks():
         # Easiest way to destroy all rows and their attached items
         ptt_main_dlg.lst_tasks.setRowCount(0)
 
-        # Refreshing the empty tasks button activation
-        enable_btn_lst_tasks_empty()
+        # Showing/hiding the delete all action in the context menu
+        show_action_delete_all()
 
         # Save my tasks on disk
         save_tasks_to_file()
@@ -749,8 +752,8 @@ def add_new_task(p_text_task: str):
         # Turning the new task added into the active one
         change_active_task(0, 0)
 
-        # Refreshing the empty tasks button activation
-        enable_btn_lst_tasks_empty()
+        # Showing/hiding the delete all action in the context menu
+        show_action_delete_all()
 
 
 # Function enable_btn_task_add : enables or disables the button to add a task depending if z_task_to_add is filled
@@ -761,13 +764,16 @@ def enable_btn_task_add():
         ptt_main_dlg.btn_task_add.setEnabled(True)
 
 
-# Function enable_btn_lst_tasks_empty : enables or disables the button depending if the list has elements or not
-def enable_btn_lst_tasks_empty():
-    w_nbr_rows = ptt_main_dlg.lst_tasks.rowCount()
-    if w_nbr_rows > 0:
-        ptt_main_dlg.btn_lst_tasks_empty.setEnabled(True)
+# Function show_action_delete_all : show/hide the actionDeleteAll in the context menu if there is at least 1 row
+def show_action_delete_all():
+
+    # Showing + displaying the action in the right context menu, otherwise, hiding it and forcing to no context menu
+    if ptt_main_dlg.lst_tasks.rowCount() > 0:
+        ptt_main_dlg.lst_tasks.setContextMenuPolicy(Qt.ActionsContextMenu)
+        actionDeleteAll.setVisible(True)
     else:
-        ptt_main_dlg.btn_lst_tasks_empty.setEnabled(False)
+        ptt_main_dlg.lst_tasks.setContextMenuPolicy(Qt.NoContextMenu)
+        actionDeleteAll.setVisible(False)
 
 
 # Function delete_selected_tasks : deletes all the selected tasks in the lst_tasks list
@@ -802,8 +808,8 @@ def delete_selected_tasks():
         # Forcing the 1st displayed row to become the active task
         change_active_task(0, 0)
 
-        # Refreshing the empty tasks button activation
-        enable_btn_lst_tasks_empty()
+        # Showing/hiding the delete all action in the context menu
+        show_action_delete_all()
 
 
 # Function add_duration_to_task_at_row : adds a duration to the task duration found at the row received
@@ -932,9 +938,11 @@ def enable_lst_tasks_popup_actions():
     actionEdit.setVisible(False)
     actionMerge.setVisible(False)
     actionDelete.setVisible(False)
+    actionDeleteAll.setVisible(False)
 
     # ContextMenuPolicy is set to None by default
-    # Trick to avoid the "ghostly" square with no option when no row selected looking -> °
+    # Trick to avoid the "ghostly" square with no option when no row selected looking like this -> °
+
     ptt_main_dlg.lst_tasks.setContextMenuPolicy(Qt.NoContextMenu)
 
     # There must be at least some rows to display the actions
@@ -950,9 +958,8 @@ def enable_lst_tasks_popup_actions():
             w_nbr_rows_selected = w_nbr_rows_selected + 1
             w_last_index_selected = index.row()
 
-        # If at least one row selected, forcing the ContextMenuPolicy in order to have the actions available
-        if w_nbr_rows_selected > 0:
-            ptt_main_dlg.lst_tasks.setContextMenuPolicy(Qt.ActionsContextMenu)
+        # Setting the ContextMenuPolicy up if we have at least 1 row (because of the "delete all" option)
+        ptt_main_dlg.lst_tasks.setContextMenuPolicy(Qt.ActionsContextMenu)
 
         # actionActivate is visible if only one row is selected and it can't be the row 0
         if w_nbr_rows_selected == 1 and w_last_index_selected > 0:
@@ -969,6 +976,9 @@ def enable_lst_tasks_popup_actions():
         # actionDelete is visible if at least one row is selected
         if w_nbr_rows_selected > 0:
             actionDelete.setVisible(True)
+
+        # actionDeleteAll is visible as long there are rows in the list
+        actionDeleteAll.setVisible(True)
 
         # Depending on the rows selected, we display either the duration of the tasks selected or the latest backup time
         if w_nbr_rows_selected > 1:
@@ -1374,8 +1384,8 @@ if __name__ == "__main__" and (w_is_ptt_start_allowed is True):
     # Create a new task at startup
     add_new_task(glb_new_task_at_startup)
 
-    # Refreshing the empty tasks button activation
-    enable_btn_lst_tasks_empty()
+    # Showing/hiding the delete all action in the context menu
+    show_action_delete_all()
 
     # Replacing the focus at the top
     default_focus()
@@ -1405,9 +1415,6 @@ if w_is_ptt_start_allowed is True:
     # Adding a new task to the lst_tasks list when Enter key is pressed
     ptt_main_dlg.z_task_to_add.returnPressed.connect(lambda: add_new_task(ptt_main_dlg.z_task_to_add.text()))
 
-    # Emptying the lst_tasks list of all of its rows
-    ptt_main_dlg.btn_lst_tasks_empty.clicked.connect(empty_lst_tasks)
-
     # Turning a double clicked row as the active task on the 1st row
     ptt_main_dlg.lst_tasks.cellDoubleClicked.connect(change_active_task)
 
@@ -1434,6 +1441,9 @@ if w_is_ptt_start_allowed is True:
 
     # Popup / actionDelete : deleting the selected tasks
     actionDelete.triggered.connect(delete_selected_tasks)
+
+    # Popup / actionDeleteAll : empty the list/deletes ALL the tasks
+    actionDeleteAll.triggered.connect(empty_lst_tasks)
 
     # Menu bar, menu PTT / actionQuit : closing the application
     ptt_main_dlg.actionQuit.triggered.connect(ptt_main_dlg.close)

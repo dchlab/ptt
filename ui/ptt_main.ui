@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>621</width>
-    <height>409</height>
+    <height>373</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>621</width>
-    <height>409</height>
+    <height>373</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>621</width>
-    <height>409</height>
+    <height>373</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -144,19 +144,6 @@
      <string>Ajouter une tâche</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_lst_tasks_empty">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>340</y>
-      <width>121</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Vider la liste</string>
-    </property>
-   </widget>
   </widget>
   <widget class="QMenuBar" name="ptt_menubar">
    <property name="geometry">
@@ -203,7 +190,6 @@
   <tabstop>z_task_to_add</tabstop>
   <tabstop>btn_task_add</tabstop>
   <tabstop>lst_tasks</tabstop>
-  <tabstop>btn_lst_tasks_empty</tabstop>
  </tabstops>
  <resources/>
  <connections/>

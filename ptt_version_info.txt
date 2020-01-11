@@ -6,8 +6,8 @@ VSVersionInfo(
   ffi=FixedFileInfo(
     # filevers and prodvers should be always a tuple with four items: (1, 2, 3, 4)
     # Set not needed items to zero 0.
-    filevers=(0, 2, 8, 0),
-    prodvers=(0, 2, 8, 0),
+    filevers=(0, 2, 9, 0),
+    prodvers=(0, 2, 9, 0),
     # Contains a bitmask that specifies the valid bits 'flags'r
     mask=0x3f,
     # Contains a bitmask that specifies the Boolean attributes of the file.
@@ -33,13 +33,13 @@ VSVersionInfo(
         StringStruct(u'LegalCopyright', u'©DCHlab'),
         StringStruct(u'CompanyName', u'DCHlab'),
         StringStruct(u'FileDescription', u'PTT - Python Time Tracker'),
-        StringStruct(u'FileVersion', u'0.2.8'),
-        StringStruct(u'ProductVersion', u'0.2.8'),
+        StringStruct(u'FileVersion', u'0.2.9'),
+        StringStruct(u'ProductVersion', u'0.2.9'),
         StringStruct(u'InternalName', u'PTT'),
         StringStruct(u'LegalTrademarks', u'PTT is a Trademark of DCHlab.'),
         StringStruct(u'OriginalFilename', u'ptt.exe'),
         StringStruct(u'ProductName', u'PTT'),
-        StringStruct(u'BuildID', u'20200107181900')])
+        StringStruct(u'BuildID', u'20200111190400')])
       ]), 
     VarFileInfo([VarStruct(u'Translation', [0, 1200])])
   ]
