@@ -1,7 +1,7 @@
 # PTT - Python Time Tracker
 
-Copyright (C) 2019 David CH. All rights reserved.\
-Portions Copyright (C) 2019 David CH. All rights reserved.\
+Copyright (C) 2020 David CH. All rights reserved.\
+Portions Copyright (C) 2020 David CH. All rights reserved.\
 For conditions of distribution and use, see LICENSE.TXT.
 
 What is PTT ?
@@ -24,12 +24,16 @@ Of course if you start again the application with an ampty "my_tasks.json"... it
 With which tools, libraries etc... the application was made ?
 -------------------------------------------------------------
 
-* Python 3.7.0 and PyQt 5.11.2 (API/GUI library)
-* Forms were created/designed with the Qt Designer and the .ui files are loaded dynamically in the application
-* JetBrains PyCharm Community Edition 2018.1.4 (IDE)
+* JetBrains PyCharm Community Edition 2019.3.1 (IDE)
+* Python 3.7.0
+* PyQt5 (API/GUI library) : PyQt5 5.13.0, PyQt5-sip 12.7.0, pyqt5-tools 5.13.0.1.5
+* Qt Designer (pyqt5_tools\Qt\bin\designer.exe) for the form design ; the .ui files are loaded dynamically in the application
 * The icon was made with GIMP
-* Pyinstaller for freezing the code (not built in one file mode, for performance)
+* Pyinstaller 3.6 for freezing the code (not built in one file mode, for performance)
 * Inno Setup 6.0.3 for the free Windows installer
+
+Note that is important to update Pyinstaller to 3.6 along with PyQt5 > 5.12.2 since some changes were made in find_qt.\
+Otherwise, the error "ImportError: unable to find Qt5Core.dll on PATH" will be raised when running the .exe !
 
 Is it your 1st application and 1st time using Python ?
 ------------------------------------------------------
