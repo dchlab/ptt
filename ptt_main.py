@@ -53,10 +53,10 @@ import datetime
 # Miscellaneous / Specific functions
 # ------------------------------------------- #
 
-# Function ptt_resource_path : get absolute path to resource, works for dev and for PyInstaller (if files added in .exe)
+# Function ptt_resource_path : gets absolute path to resource, works for dev mode and for PyInstaller "onefile" .exe
 def ptt_resource_path(p_relative_path: str):
     try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        # PyInstaller creates a temp folder and stores path in _MEIPASS (But not used as of today in PTT)
         w_base_path = sys._MEIPASS
     except:
         w_base_path = os.path.abspath(".")
@@ -170,9 +170,6 @@ glb_active_task_timer.start(glb_timer_interval_in_msec)
 glb_ptt_lock_timer = QtCore.QTimer()
 glb_ptt_lock_timer.start(glb_timer_ptt_lock_interval_in_msec)
 
-# Empty string
-glb_empty_str = ""
-
 # Date/time string format displayed
 glb_dd_MM_yyyy_hh_mm_string_format = "dd/MM/yyyy hh:mm"
 
@@ -241,9 +238,9 @@ glb_day = "jour"
 glb_days = "jours"
 glb_no_time_duration = "nulle"
 
-# ------------------------------------------- #
-# Main window global variables (cells read)
-# ------------------------------------------- #
+# --------------------------------------------------- #
+# Main window global variables (current row contents)
+# --------------------------------------------------- #
 
 z_curr_row = 0
 z_curr_task_dth = ""
@@ -281,9 +278,9 @@ ptt_main_dlg.lst_tasks.addAction(actionDelete)
 ptt_main_dlg.lst_tasks.addAction(actionDeleteAll)
 
 
-# ------------------------------------------- #
-# Functions used for pseudo locking the app
-# ------------------------------------------- #
+# ----------------------------------------------- #
+# Functions used for pseudo-mutex locking the app
+# ----------------------------------------------- #
 
 # Function check_ptt_lock_existence : checks if the ptt.lock file exists and returns a boolean and the 1st line found
 def check_ptt_lock_existence():
@@ -303,7 +300,7 @@ def check_ptt_lock_existence():
     except:
         print("check_ptt_lock_existence : file '{}' not found".format(w_ptt_files.ptt_lock))
 
-    # Returns the file existence boolean and the string of the 1st line
+    # Returning the file existence boolean and the string of the 1st line
     return w_file_exists, w_first_line
 
 
@@ -345,7 +342,7 @@ def ptt_start_allowed():
     # If the file doesn't exist or if the file contains crap, it's considered as invalid
     # and which means we can overwrite it with the current timestamp.
     # Note that the ptt.lock file is updated every 30 seconds with the help of a timer,
-    # in another part of the code.
+    # placed in another part of the code.
     # PS : Windows/DOS doesn't allow to really lock files like it's done in Unix/Posix...
     # ----------------------------------------------------------------------------------- #
 
@@ -399,7 +396,7 @@ def ptt_start_allowed():
         # Otherwise, it means everything is clear and we can grant the access
         w_ptt_start_allowed = True
 
-    # If we are allowed to start ptt, we create/overwrite the "lock" file
+    # If we are allowed to start ptt, we can create/overwrite the "lock" file
     if w_ptt_start_allowed is True:
         write_ptt_lock()
 
@@ -499,10 +496,10 @@ def update_status_bar_selected_tasks_duration():
     update_status_bar_message(w_message)
 
 
-# Function default_focus : puts focus back on the entry input field
+# Function default_focus : puts the focus back on the entry input field
 def default_focus():
 
-    # Clearing the selected/clicked task and placing the focus back to the "task to add" text field
+    # Deselecting the task(s) and placing the focus back to the "task to add" text field
     ptt_main_dlg.lst_tasks.clearSelection()
     ptt_main_dlg.z_task_to_add.setFocus()
 
@@ -606,7 +603,7 @@ def warning_popup_yes_no(p_popup_title: str, p_popup_question: str):
         # Displaying the message box
         w_popup.exec_()
 
-        # Button yes was pushed
+        # Button Yes was pushed
         if w_popup.clickedButton() == btn_yes:
             p_btn_yes_pushed = True
 
@@ -614,7 +611,7 @@ def warning_popup_yes_no(p_popup_title: str, p_popup_question: str):
         # Else, if it's not french, displaying the warning popup directly...
         w_popup_result = w_popup.warning(None, p_popup_title, p_popup_question, w_popup.Yes | w_popup.No)
 
-        # Button yes was pushed
+        # Button Yes was pushed
         if w_popup_result == w_popup.Yes:
             p_btn_yes_pushed = True
 
@@ -631,18 +628,18 @@ def change_active_task(p_row: int, p_column: int):
     # Making sure we have some rows at least...
     if ptt_main_dlg.lst_tasks.rowCount() > 0:
 
-        # Restart the global active task timer (only if we activate a task which is not the already activated one)
+        # Restarting the global active task timer (only if we activate a task which is not the already activated one)
         if p_row > 0:
             glb_active_task_timer.start(glb_timer_interval_in_msec)
 
-        # Retrieves the text of the 3 cells from the selected line
+        # Retrieving the text of the 3 cells from the selected line
         w_cell0_selected, w_cell1_selected, w_cell2_selected = get_lst_tasks_row_cells(p_row)
 
         # If the task to be activated is not at row 0, inserting a new row at the top of the list
         if p_row > 0:
             ptt_main_dlg.lst_tasks.insertRow(0)
 
-        # Fix to avoid the "yellow line" (= text refreshed) on the 2nd row (row 1) when inserting new row
+        # Fix to avoid the "yellow background" to be applied on the 2nd row (row 1) when inserting a new row
         if ptt_main_dlg.lst_tasks.rowCount() > 1:
             w_cell0_row1, w_cell1_row1, w_cell2_row1 = get_lst_tasks_row_cells(1)
             update_lst_tasks_row_cells(1, w_cell0_row1, w_cell1_row1, w_cell2_row1)
@@ -657,7 +654,7 @@ def change_active_task(p_row: int, p_column: int):
         # Replacing the focus at the top
         default_focus()
 
-    # Save my tasks on disk
+    # Saving my tasks on disk
     save_tasks_to_file()
 
 
@@ -676,7 +673,7 @@ def empty_lst_tasks():
         # Showing/hiding the delete all action in the context menu
         show_action_delete_all()
 
-        # Save my tasks on disk
+        # Saving my tasks on disk
         save_tasks_to_file()
 
 
@@ -684,9 +681,9 @@ def empty_lst_tasks():
 def get_lst_tasks_row_cells(p_row: int):
 
     # Miscellaneous initializations
-    p_cell0_text = glb_empty_str
-    p_cell1_text = glb_empty_str
-    p_cell2_text = glb_empty_str
+    p_cell0_text = ""
+    p_cell1_text = ""
+    p_cell2_text = ""
 
     # Making sure we have some rows at least...
     w_nbr_rows = ptt_main_dlg.lst_tasks.rowCount()
@@ -697,11 +694,11 @@ def get_lst_tasks_row_cells(p_row: int):
         p_cell1_text = ptt_main_dlg.lst_tasks.item(p_row, 1).text()
         p_cell2_text = ptt_main_dlg.lst_tasks.item(p_row, 2).text()
 
-    # Returns the values
+    # Returning the values
     return p_cell0_text, p_cell1_text, p_cell2_text
 
 
-# Function update_lst_tasks_row_cells : fills the text in each cell of a specified row
+# Function update_lst_tasks_row_cells : updates the text in each cell of a specified row
 def update_lst_tasks_row_cells(p_row: int, p_cell0_text: str, p_cell1_text: str, p_cell2_text: str):
 
     # Making sure we have some rows at least...
@@ -718,7 +715,7 @@ def update_lst_tasks_row_cells(p_row: int, p_cell0_text: str, p_cell1_text: str,
         w_cell0_qtwi.setTextAlignment(QtCore.Qt.AlignCenter)
         w_cell1_qtwi.setTextAlignment(QtCore.Qt.AlignCenter)
 
-        # If the row is 0 aka the 1st displayed row, the background of the cells are yellow
+        # If the row is 0, the 1st displayed row, the background of the cells is set to yellow color
         if p_row == 0:
             w_cell0_qtwi.setBackground(QtGui.QColor(255, 255, 0))
             w_cell1_qtwi.setBackground(QtGui.QColor(255, 255, 0))
@@ -734,7 +731,7 @@ def update_lst_tasks_row_cells(p_row: int, p_cell0_text: str, p_cell1_text: str,
 def add_new_task(p_text_task: str):
 
     # The text must be filled to add a new entry
-    if p_text_task != glb_empty_str:
+    if p_text_task != "":
 
         # Getting the current datetime and formatting it
         w_now_dth = QtCore.QDateTime.currentDateTime()
@@ -747,7 +744,7 @@ def add_new_task(p_text_task: str):
         update_lst_tasks_row_cells(0, w_now_dth_string, glb_00_00_time, p_text_task)
 
         # Setting to blank the entry text
-        ptt_main_dlg.z_task_to_add.setText(glb_empty_str)
+        ptt_main_dlg.z_task_to_add.setText("")
 
         # Turning the new task added into the active one
         change_active_task(0, 0)
@@ -758,7 +755,7 @@ def add_new_task(p_text_task: str):
 
 # Function enable_btn_task_add : enables or disables the button to add a task depending if z_task_to_add is filled
 def enable_btn_task_add():
-    if ptt_main_dlg.z_task_to_add.text() == glb_empty_str:
+    if ptt_main_dlg.z_task_to_add.text() == "":
         ptt_main_dlg.btn_task_add.setEnabled(False)
     else:
         ptt_main_dlg.btn_task_add.setEnabled(True)
@@ -801,7 +798,7 @@ def delete_selected_tasks():
         # Sorting the list in order to get reversed sorting (to avoid loosing the index if ascendant deletion !)
         lst_rows_to_delete.sort(reverse=True)
 
-        # Deleting the rows in the lst_tasks list with the row number of the temp list
+        # Deleting the rows in the lst_tasks list with the row number of the temporary list
         for row_to_delete in lst_rows_to_delete:
             ptt_main_dlg.lst_tasks.removeRow(row_to_delete)
 
@@ -820,7 +817,7 @@ def add_duration_to_task_at_row(p_row: int, p_duration_to_add_in_secs: int):
 
     if w_nbr_rows > 0:
 
-        # Retrieves the text of the 3 cells from the selected line (any row but fixed columns values)
+        # Retrieving the text of the 3 cells from the selected line (any row but fixed columns values)
         w_cell0_text, w_cell1_text, w_cell2_text = get_lst_tasks_row_cells(p_row)
 
         # Turning the text of cell1 in 'hh:mm' format into true Qtime format
@@ -853,13 +850,13 @@ def add_duration_to_task_at_row(p_row: int, p_duration_to_add_in_secs: int):
                 w_cell1_text = w_task_duration.toString(glb_hh_mm_string_format)
                 update_lst_tasks_row_cells(p_row, w_cell0_text, w_cell1_text, w_cell2_text)
 
-                # Create a new task with the remains in secs
+                # Creating a new task with the remains in secs
                 add_new_task(w_cell2_text)
                 add_duration_to_task_at_row(0, w_remains_in_secs)
 
             else:
 
-                # Add the duration received to the current task duration
+                # Adding the duration received to the current task duration
                 w_task_duration = w_qt_task_duration.addSecs(p_duration_to_add_in_secs)
 
                 # Turning the task duration back to string in 'hh:mm' format
@@ -868,7 +865,7 @@ def add_duration_to_task_at_row(p_row: int, p_duration_to_add_in_secs: int):
                 # Putting back the row with the updated task duration
                 update_lst_tasks_row_cells(p_row, w_cell0_text, w_cell1_text, w_cell2_text)
 
-    # Save my tasks on disk
+    # Saving my tasks on disk
     save_tasks_to_file()
 
 
@@ -882,7 +879,7 @@ def auto_increment_active_task():
     if w_nbr_rows == 0:
         add_new_task(glb_default_task_name)
 
-    # Add XX seconds to the duration in the active task at row(0)
+    # Adding XX seconds to the duration in the active task at row(0)
     add_duration_to_task_at_row(0, glb_default_added_duration_in_sec)
 
 
@@ -905,7 +902,7 @@ def sum_selected_tasks_duration():
         indexes = ptt_main_dlg.lst_tasks.selectionModel().selectedRows()
         for index in sorted(indexes):
 
-            # Retrieves the text of the 3 cells from the selected line (any row but fixed columns values)
+            # Retrieving the text of the 3 cells from the selected line (any row but fixed columns values)
             w_cell0_text, w_cell1_text, w_cell2_text = get_lst_tasks_row_cells(index.row())
 
             # Saving the tuple in the list
@@ -920,7 +917,7 @@ def sum_selected_tasks_duration():
             # Converting the Qtime into seconds (seconds from 00:00:00 to the Qtime value :p )
             w_task_duration_in_secs = QtCore.QTime(0, 0, 0).secsTo(w_qt_task_duration)
 
-            # Add the duration read to the total task duration
+            # Adding the duration read to the total task duration
             w_selected_task_duration_in_secs = w_selected_task_duration_in_secs + w_task_duration_in_secs
 
         # Finally returning the duration
@@ -930,7 +927,7 @@ def sum_selected_tasks_duration():
 # Function enable_lst_tasks_popup_actions : makes actions visible or not for the lst_tasks list
 def enable_lst_tasks_popup_actions():
 
-    # Need to check if we have tasks in the list before
+    # We need to check if we have tasks in the list before
     w_nbr_rows = ptt_main_dlg.lst_tasks.rowCount()
 
     # Hiding all actions by default
@@ -940,8 +937,8 @@ def enable_lst_tasks_popup_actions():
     actionDelete.setVisible(False)
     actionDeleteAll.setVisible(False)
 
-    # ContextMenuPolicy is set to None by default
-    # Trick to avoid the "ghostly" square with no option when no row selected looking like this -> °
+    # /!\ ContextMenuPolicy is set to None by default
+    # -> Trick to avoid the "ghostly" square to be displayed with no option, when no row selected looking like this -> °
 
     ptt_main_dlg.lst_tasks.setContextMenuPolicy(Qt.NoContextMenu)
 
@@ -995,7 +992,7 @@ def popup_change_active_task():
 
     if w_nbr_rows > 0:
 
-        # Normally, the action is only reachable if one task is selected... so should be enough
+        # Normally, the action is only reachable if one task is selected... so it should be enough
         # It's a fake loop in order to get the 1st selected row
 
         indexes = ptt_main_dlg.lst_tasks.selectionModel().selectedRows()
@@ -1029,7 +1026,7 @@ def merge_selected_tasks():
         indexes = ptt_main_dlg.lst_tasks.selectionModel().selectedRows()
         for index in sorted(indexes):
 
-            # Retrieves the text of the 3 cells from the selected line (any row but fixed columns values)
+            # Retrieving the text of the 3 cells from the selected line (any row but fixed columns values)
             w_cell0_text, w_cell1_text, w_cell2_text = get_lst_tasks_row_cells(index.row())
 
             # Saving the tuple in the list for the rows to merge
@@ -1047,10 +1044,10 @@ def merge_selected_tasks():
             # Converting the Qtime into seconds (seconds from 00:00:00 to the Qtime value :p )
             w_task_duration_in_secs = QtCore.QTime(0, 0, 0).secsTo(w_qt_task_duration)
 
-            # Add the duration read to the total task duration
+            # Adding the duration read to the total task duration
             w_total_duration_in_secs = w_total_duration_in_secs + w_task_duration_in_secs
 
-        # Merge is aborted if the total duration of merged tasks exceeds to the max task duration !
+        # The merge is aborted if the total duration of merged tasks exceeds the max task duration !
         if w_total_duration_in_secs > glb_max_task_duration_in_sec:
 
             # Error popup message
@@ -1061,17 +1058,20 @@ def merge_selected_tasks():
             # Deleting the tasks and updating the "upper" one (since the list of merges is sorted etc...)
             w_nbr_of_rows_to_merge = len(lst_rows_to_merge)
 
-            # Merged tasks "text collector"
+            # Initializing the merged tasks "text collector"
             w_merged_text_collector = ""
 
             for w_row, w_text0, w_text1, w_text2 in lst_rows_to_merge:
 
                 # Concatenation of the tasks descriptions which will be merged
-                if w_merged_text_collector == "":
-                    if w_text2 != "":
+                # The final text will look like "1st line of text\n+ 2nd line of text\n+ 3rd line etc..."
+
+                # Strings with trailing whitespaces won't be concatenated to avoid "+\n +\n +\n " etc...
+                if w_text2.rstrip() != "":
+                    if w_merged_text_collector == "":
                         w_merged_text_collector = w_text2
-                else:
-                    w_merged_text_collector = w_merged_text_collector + "\n +" + w_text2
+                    else:
+                        w_merged_text_collector = w_merged_text_collector + "\n+ " + w_text2
 
                 # All tasks must be deleted MINUS one
                 w_nbr_of_tasks_to_delete = w_nbr_of_tasks_to_delete + 1
@@ -1104,10 +1104,10 @@ def read_current_task():
         indexes = ptt_main_dlg.lst_tasks.selectionModel().selectedRows()
         for index in indexes:
 
-            # Retrieves the text of the 3 cells from the selected line
+            # Retrieving the text of the 3 cells from the selected line
             z_curr_task_dth, z_curr_task_duration, z_curr_task_description = get_lst_tasks_row_cells(index.row())
 
-            # Retrieves current row number
+            # Retrieving current row number
             z_curr_row = index.row()
 
 
@@ -1149,7 +1149,7 @@ def update_task_after_edit(p_curr_row: int, p_curr_task_dth: str, p_curr_task_du
     # Replacing the focus at the top
     default_focus()
 
-    # Save my tasks on disk
+    # Saving my tasks on disk
     save_tasks_to_file()
 
 
@@ -1230,13 +1230,6 @@ def load_tasks_from_file():
         # Filling the text in each cells of the new row
         update_lst_tasks_row_cells(
             w_row_count, w_task_record["started_on"], w_task_record["duration"], w_task_record["description"])
-
-    """ Portion of code not needed anymore (since we add a new task at startup and it does activation + backup then)
-    # Forcing the 1st displayed row to become the active task if at least one record loaded
-    w_row_count = ptt_main_dlg.lst_tasks.rowCount()
-    if w_row_count > 0:
-        change_active_task(0, 0)
-    """
 
 
 # Function create_tasks_backup : creates a backup file of the "my_tasks.json" file

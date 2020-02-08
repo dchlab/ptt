@@ -24,7 +24,7 @@ Of course if you start again the application with an ampty "my_tasks.json"... it
 With which tools, libraries etc... the application was made ?
 -------------------------------------------------------------
 
-* JetBrains PyCharm Community Edition 2019.3.1 (IDE)
+* JetBrains PyCharm Community Edition 2019.3.3 (IDE)
 * Python 3.7.0
 * PyQt5 (API/GUI library) : PyQt5 5.13.0, PyQt5-sip 12.7.0, pyqt5-tools 5.13.0.1.5
 * Qt Designer (pyqt5_tools\Qt\bin\designer.exe) for the form design ; the .ui files are loaded dynamically in the application
