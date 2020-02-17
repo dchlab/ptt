@@ -47,6 +47,54 @@ import sys
 import os
 import json
 import datetime
+import configparser
+
+
+# ------------------------------------------- #
+# Classes
+# ------------------------------------------- #
+
+# Class PttFiles : contains the data file names used in the application
+class PttFiles:
+    def __init__(self):
+        self.my_tasks_json = "data/my_tasks.json"
+        self.my_tasks_backup = "data/my_tasks.backup"
+        self.ptt_lock = "data/ptt.lock"
+        self.ptt_config_ini = "data/ptt_config.ini"
+
+
+# Class PttResourcesFiles : contains the file names used for the resources in the application
+class PttResourcesFiles:
+    def __init__(self):
+        self.main_ui = "ui/ptt_main.ui"
+        self.edit_task_ui = "ui/ptt_edit_task.ui"
+        self.ptt_ico = "ui/ptt.ico"
+
+
+# Class TaskDuration : contains the task duration members
+class TaskDuration:
+    def __init__(self):
+        self.days = 0
+        self.hours = 0
+        self.minutes = 0
+        self.seconds = 0
+
+
+# Class PttConfigValues : contains the values of the ptt_config.ini file
+class PttConfigValues:
+    def __init__(self):
+        self.UI_Language = ""
+
+
+# Object for edit_task_signal calling parameters between windows
+class PttEditObject(QObject):
+    edit_task_signal = QtCore.pyqtSignal(int, str, str, str)
+
+
+# Classes initializations
+ptt_main_calling_edit = PttEditObject()
+ptt_edit_task_saving = PttEditObject()
+ptt_resources = PttResourcesFiles()
 
 
 # ------------------------------------------- #
@@ -93,44 +141,84 @@ def convert_task_duration_secs_to_dhms(p_duration_in_secs: int, p_working_day_du
     return w_task_duration
 
 
-# ------------------------------------------- #
-# Classes
-# ------------------------------------------- #
+# Function read_ptt_config : reads ptt_config.ini and returns the values found as a class
+def read_ptt_config():
 
-# Class PttFiles : contains the data file names used in the application
-class PttFiles:
-    def __init__(self):
-        self.my_tasks_json = "data/my_tasks.json"
-        self.my_tasks_backup = "data/my_tasks.backup"
-        self.ptt_lock = "data/ptt.lock"
+    # Miscellaneous initializations
+    w_ptt_config_values = PttConfigValues()
+    w_ptt_files = PttFiles()
+    w_language = ""
+    w_error_when_reading = False
+
+    # Reading the config file
+    w_ptt_config = configparser.ConfigParser()
+    try:
+        w_ptt_config.read(w_ptt_files.ptt_config_ini)
+    except:
+        print("read_ptt_config : error when reading the '{}' file".format(w_ptt_files.ptt_config_ini))
+        w_error_when_reading = True
+
+    # We continue if no error occurred when parsing the .ini file
+    if w_error_when_reading is False:
+
+        # Reading the [UI] section and its keys ; also using fallback values, just in case...
+        try:
+            w_ui_section = w_ptt_config["UI"]
+            w_language = w_ui_section.get("language", "")
+        except:
+            print("read_ptt_config : cannot find the [UI] section the '{}' file".format(w_ptt_files.ptt_config_ini))
+
+        # If the language code found is not supported or not valid, we set it to the default value
+        if w_language not in {"fr", "en"}:
+            w_language = "fr"
+
+        # Updating section [UI] / key "Language" value in the class
+        w_ptt_config_values.UI_Language = w_language
+
+    # Returning the config values class
+    return w_ptt_config_values
 
 
-# Class PttResourcesFiles : contains the file names used for the resources in the application
-class PttResourcesFiles:
-    def __init__(self):
-        self.main_ui = "ui/ptt_main.ui"
-        self.edit_task_ui = "ui/ptt_edit_task.ui"
-        self.ptt_ico = "ui/ptt.ico"
+# Function write_ptt_config : writes ptt_config.ini from the values found in a class received
+def write_ptt_config(p_ptt_config_values: PttConfigValues):
 
+    # Miscellaneous initializations
+    w_ptt_files = PttFiles()
+    w_language = p_ptt_config_values.UI_Language
+    w_error_when_reading = False
 
-# Class TaskDuration : contains the task duration members
-class TaskDuration:
-    def __init__(self):
-        self.days = 0
-        self.hours = 0
-        self.minutes = 0
-        self.seconds = 0
+    # If the language code found is not supported or not valid, we set it to the default value
+    if w_language not in {"fr", "en"}:
+        w_language = "fr"
 
+    # Reading the config file
+    w_ptt_config = configparser.ConfigParser()
+    try:
+        w_ptt_config.read(w_ptt_files.ptt_config_ini)
+    except:
+        print("write_ptt_config : error when reading the '{}' file".format(w_ptt_files.ptt_config_ini))
+        w_error_when_reading = True
 
-# Object for edit_task_signal calling parameters between windows
-class PttEditObject(QObject):
-    edit_task_signal = QtCore.pyqtSignal(int, str, str, str)
+    # We continue if no error occurred when parsing the .ini file
+    if w_error_when_reading is False:
 
+        # Adding the [UI] section if none was found
+        if w_ptt_config.has_section("UI") is False:
+            try:
+                w_ptt_config.add_section("UI")
+            except:
+                print("write_ptt_config : error when adding the [UI] section the '{}' file"
+                      .format(w_ptt_files.ptt_config_ini))
 
-# Classes initializations
-ptt_main_calling_edit = PttEditObject()
-ptt_edit_task_saving = PttEditObject()
-ptt_resources = PttResourcesFiles()
+        # Updating section [UI] / key "Language" value in the config parser
+        w_ptt_config.set("UI", "language", w_language)
+
+        # Saving the whole config parser in the .ini file
+        try:
+            with open(w_ptt_files.ptt_config_ini, "w") as w_configfile:
+                w_ptt_config.write(w_configfile)
+        except:
+            print("write_ptt_config : cannot write in the '{}' file".format(w_ptt_files.ptt_config_ini))
 
 
 # ------------------------------------------- #
