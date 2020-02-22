@@ -23,6 +23,7 @@
 * User data files used :
 * - /data/my_tasks.json                 Tasks saved in a JSON format
 * - /data/my_tasks.backup               Backup of the previous file (at startup)
+* - /data/ptt_config.ini                User settings like language preferences...
 * Miscellaneous files used/generated :
 * - /data/ptt.lock                      Used as pseudo lock file
 * --------------------------------------------------------------------------------- *
@@ -166,7 +167,7 @@ def read_ptt_config():
             w_ui_section = w_ptt_config["UI"]
             w_language = w_ui_section.get("language", "")
         except:
-            print("read_ptt_config : cannot find the [UI] section the '{}' file".format(w_ptt_files.ptt_config_ini))
+            print("read_ptt_config : cannot find the [UI] section in the '{}' file".format(w_ptt_files.ptt_config_ini))
 
         # If the language code found is not supported or not valid, we set it to the default value
         if w_language not in {"fr", "en"}:
@@ -207,7 +208,7 @@ def write_ptt_config(p_ptt_config_values: PttConfigValues):
             try:
                 w_ptt_config.add_section("UI")
             except:
-                print("write_ptt_config : error when adding the [UI] section the '{}' file"
+                print("write_ptt_config : error when adding the [UI] section in the '{}' file"
                       .format(w_ptt_files.ptt_config_ini))
 
         # Updating section [UI] / key "Language" value in the config parser
@@ -219,6 +220,34 @@ def write_ptt_config(p_ptt_config_values: PttConfigValues):
                 w_ptt_config.write(w_configfile)
         except:
             print("write_ptt_config : cannot write in the '{}' file".format(w_ptt_files.ptt_config_ini))
+
+
+# Function ptt_load_translators : load translator(s) according to the language settings
+def ptt_load_translators():
+
+    # Miscellaneous initializations
+    w_locale = ""
+    w_main_translator = QtCore.QTranslator()
+    w_qt_translations_path = QtCore.QLibraryInfo.location(QtCore.QLibraryInfo.TranslationsPath)
+
+    # Retrieving language from the .ini config file
+    w_ptt_config_values = read_ptt_config()
+
+    # For now, we only deal with french and english languages (french is the default language)
+    if w_ptt_config_values.UI_Language == "fr":
+        w_locale = "fr_FR"
+    elif w_ptt_config_values.UI_Language == "en":
+        w_locale = "en_GB"
+    elif w_ptt_config_values.UI_Language not in {"fr", "en"}:
+        w_locale = "fr_FR"
+
+    # Loading the general translator with the right "qtbase_locale.qm" (generic search with fr_FR, fr if not found...)
+    # -> That will automatically fix the system texts like Yes/No texts for buttons (example)
+
+    w_main_translator.load("qtbase_" + w_locale, w_qt_translations_path)
+
+    # Returning the main translator
+    return w_main_translator
 
 
 # ------------------------------------------- #
@@ -298,9 +327,6 @@ glb_about_title = "A propos de PTT"
 glb_about_info = "PTT - Python Time Tracker\nVersion : {}\n\nAuteur : {}\nGithub : {}\n\nLibrairie(s) utilisée(s) : {}"\
     .format(glb_ptt_app_info.version, glb_ptt_app_info.author, glb_ptt_app_info.github, glb_ptt_app_info.dependencies)
 
-# Locale for french language/country
-glb_locale_fr_FR = "fr_FR"
-
 # Miscellaneous texts (for message boxes etc...)
 glb_popup_title_generic_error = "PTT - Python Time Tracker"
 glb_popup_text_app_is_already_running = "PTT est déjà en cours d'exécution."
@@ -312,9 +338,6 @@ glb_popup_title_merging = "Fusion"
 glb_popup_question_merging = "Voulez-vous fusionner les tâches sélectionnées ?"
 glb_popup_title_merging_error = "Fusion annulée"
 glb_popup_text_merging_failed = "La durée totale excède {} heures.".format(str(int(glb_max_task_duration_in_sec/3600)))
-glb_Yes_text = "Oui"
-glb_No_text = "Non"
-glb_Ok_text = "OK"
 
 # Last backup performed at
 glb_last_backup_performed_at = "Dernière sauvegarde effectuée à"
@@ -592,70 +615,42 @@ def default_focus():
     ptt_main_dlg.z_task_to_add.setFocus()
 
 
-# Function error_popup_ok : generic display of an error popup with OK button (french or default language)
+# Function error_popup_ok : generic display of an error popup with OK button
 def error_popup_ok(p_popup_title: str, p_popup_text: str):
-
-    # Retrieving the locale system value
-    w_locale = QtCore.QLocale.system().name()
 
     # Creating a new message box with the application icon
     w_popup = QMessageBox()
     w_popup.setWindowIcon(QtGui.QIcon(ptt_resources.ptt_ico))
 
-    # If the locale says it's french and french UI
-    if w_locale == glb_locale_fr_FR:
+    # Setting up the critical icon
+    w_popup.setIcon(QMessageBox.Critical)
 
-        # Setting up the critical icon
-        w_popup.setIcon(QMessageBox.Critical)
+    # Filling the title and the text and loading the OK standard button
+    w_popup.setWindowTitle(p_popup_title)
+    w_popup.setText(p_popup_text)
+    w_popup.setStandardButtons(QMessageBox.Ok)
 
-        # Filling the title and the text and loading the OK standard button
-        w_popup.setWindowTitle(p_popup_title)
-        w_popup.setText(p_popup_text)
-        w_popup.setStandardButtons(QMessageBox.Ok)
-
-        # Changing the text of the standard buttons
-        btn_ok = w_popup.button(QMessageBox.Ok)
-        btn_ok.setText(glb_Ok_text)
-
-        # Displaying the message box
-        w_popup.exec_()
-
-    else:
-        # Else, if it's not french, displaying the error popup directly...
-        w_popup.critical(None, p_popup_title, p_popup_text, w_popup.Ok)
+    # Displaying the message box
+    w_popup.exec_()
 
 
 # Function info_popup_ok : generic display of an info popup with OK button (french or default language)
 def info_popup_ok(p_popup_title: str, p_popup_text: str):
 
-    # Retrieving the locale system value
-    w_locale = QtCore.QLocale.system().name()
-
     # Creating a new message box with the application icon
     w_popup = QMessageBox()
     w_popup.setWindowIcon(QtGui.QIcon(ptt_resources.ptt_ico))
 
-    # If the locale says it's french and french UI
-    if w_locale == glb_locale_fr_FR:
+    # Setting up the critical icon
+    w_popup.setIcon(QMessageBox.Information)
 
-        # Setting up the critical icon
-        w_popup.setIcon(QMessageBox.Information)
+    # Filling the title and the text and loading the OK standard button
+    w_popup.setWindowTitle(p_popup_title)
+    w_popup.setText(p_popup_text)
+    w_popup.setStandardButtons(QMessageBox.Ok)
 
-        # Filling the title and the text and loading the OK standard button
-        w_popup.setWindowTitle(p_popup_title)
-        w_popup.setText(p_popup_text)
-        w_popup.setStandardButtons(QMessageBox.Ok)
-
-        # Changing the text of the standard buttons
-        btn_ok = w_popup.button(QMessageBox.Ok)
-        btn_ok.setText(glb_Ok_text)
-
-        # Displaying the message box
-        w_popup.exec_()
-
-    else:
-        # Else, if it's not french, displaying the info popup directly...
-        w_popup.information(None, p_popup_title, p_popup_text, w_popup.Ok)
+    # Displaying the message box
+    w_popup.exec_()
 
 
 # Function warning_popup_yes_no : generic display of a warning popup with yes/no choice (french or default language)
@@ -664,44 +659,28 @@ def warning_popup_yes_no(p_popup_title: str, p_popup_question: str):
     # Miscellaneous initializations
     p_btn_yes_pushed = False
 
-    # Retrieving the locale system value
-    w_locale = QtCore.QLocale.system().name()
-
     # Creating a new message box with the application icon
     w_popup = QMessageBox()
     w_popup.setWindowIcon(QtGui.QIcon(ptt_resources.ptt_ico))
 
-    # If the locale says it's french and french UI
-    if w_locale == glb_locale_fr_FR:
+    # Setting up the warning icon
+    w_popup.setIcon(QMessageBox.Warning)
 
-        # Setting up the warning icon
-        w_popup.setIcon(QMessageBox.Warning)
+    # Filling the title and the question and loading the Yes/No standard buttons
+    w_popup.setWindowTitle(p_popup_title)
+    w_popup.setText(p_popup_question)
+    w_popup.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
 
-        # Filling the title and the question and loading the Yes/No standard buttons
-        w_popup.setWindowTitle(p_popup_title)
-        w_popup.setText(p_popup_question)
-        w_popup.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    # Setting the value we need to intercept when Yes button is pushed
+    # PS : no need to use anymore btn_yes.setText to change the text of the buttons when using translators
+    btn_yes = w_popup.button(QMessageBox.Yes)
 
-        # Changing the text of the standard buttons
-        btn_yes = w_popup.button(QMessageBox.Yes)
-        btn_yes.setText(glb_Yes_text)
-        btn_no = w_popup.button(QMessageBox.No)
-        btn_no.setText(glb_No_text)
+    # Displaying the message box
+    w_popup.exec_()
 
-        # Displaying the message box
-        w_popup.exec_()
-
-        # Button Yes was pushed
-        if w_popup.clickedButton() == btn_yes:
-            p_btn_yes_pushed = True
-
-    else:
-        # Else, if it's not french, displaying the warning popup directly...
-        w_popup_result = w_popup.warning(None, p_popup_title, p_popup_question, w_popup.Yes | w_popup.No)
-
-        # Button Yes was pushed
-        if w_popup_result == w_popup.Yes:
-            p_btn_yes_pushed = True
+    # Button Yes was pushed
+    if w_popup.clickedButton() == btn_yes:
+        p_btn_yes_pushed = True
 
     # Returning the value
     return p_btn_yes_pushed
@@ -1564,6 +1543,14 @@ if w_is_ptt_start_allowed is True:
 # ------------------------------------------- #
 
 if w_is_ptt_start_allowed is True:
+
+    # Installing translators
+    # Weird behaviour : for some strange reason, i can't seem to use installTranslator on a QtWidgets.QApplication
+    # INSIDE a function, even through an entry parameter or access/alter the QtWidgets.QApplication through "Global" !
+    # -> for now, i will just return the translator and install it here...
+
+    w_ptt_main_translator = ptt_load_translators()
+    ptt_main_app.installTranslator(w_ptt_main_translator)
 
     # Initializing and running the main window
     ptt_main_dlg.show()
